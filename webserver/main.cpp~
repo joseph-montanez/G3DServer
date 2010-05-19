@@ -1,0 +1,530 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
+/*
+ * main.cc
+ * Copyright (C) joseph montanez 2009 <joseph@>
+ *
+ * main.cc is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * main.cc is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "WebController.h"
+#include "WebServer.h"
+#include "ServerSocket.h"
+#include "SocketException.h"
+#include "SqlRow.h"
+#include "SqlQuery.h"
+#include <string>
+#include <stdio.h>
+#include <iostream>
+#include <map>
+
+#include <sqlite3.h>
+
+using namespace std;
+
+
+class G3DTemplate {
+public:
+
+    static string header(const char* page_title) {
+        return G3DTemplate::header(page_title, "home");
+    }
+
+    static string header(const char* page_title, const char* nav_item) {
+        string title = page_title;
+        string html;
+        html.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
+        <html>\
+        <head>\
+            <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\" />\
+            <title>" + title + "</title>\
+            <meta name=\"keywords\" content=\"\" />\
+            <meta name=\"description\" content=\"\" />\
+            <link rel=\"stylesheet\" type=\"text/css\" href=\"http://www.gorilla3d.com/labs/default.css\" />\
+        </head>\
+        <body>\
+        <div id=\"outer\">\
+            <div id=\"header\">\
+            <div id=\"headercontent\">\
+                <h1>Gorilla<sup>Labs</sup></h1>\
+                <h2>Documenting my projects</h2>\
+            </div>\
+    </div>\
+    <div id=\"menu\">\
+            <ul>\
+        ");
+
+        if (nav_item == "home") {
+            html.append("<li><a href=\"#\" class=\"active\">Home</a></li>");
+        } else {
+            html.append("<li><a href=\"#\">Home</a></li>");
+        }
+
+        if (nav_item == "webserver") {
+            html.append("<li><a href=\"webserver\" class=\"active\">G3D::WebServer</a></li>");
+        } else {
+            html.append("<li><a href=\"webserver\">G3D::WebServer</a></li>");
+        }
+
+        if (nav_item == "db") {
+            html.append("<li><a href=\"db\" class=\"active\">db</a></li>");
+        } else {
+            html.append("<li><a href=\"db\">db</a></li>");
+        }
+
+        html.append("\
+            </ul>\
+    </div>\
+        ");
+        return html;
+    }
+
+    static string post(const char* post_title, const char* post_content, const char* post_date) {
+        string html;
+        string title = post_title;
+        string date = post_date;
+        string content = post_content;
+        html.append("\
+            <div class=\"post\">\
+                <h4>" + title + "</h4>\
+                <div class=\"contentarea\">\
+                    <div class=\"details\">Posted on " + date + "</div>    \
+                    " + content + "\
+                </div>\
+            </div>\
+            <div class=\"divider2\"></div>\
+        ");
+        return html;
+    }
+
+    static string content(string content) {
+        return G3DTemplate::content(content.c_str());
+    }
+
+    static string content(const char* content) {
+        string html;
+
+        string posts = content;
+
+        html.append("\
+        <div id=\"content\">\
+            <div id=\"primarycontainer\">\
+                <div id=\"primarycontent\">\
+                    " + posts + "\
+                </div>\
+            </div>\
+            <div id=\"secondarycontent\">\
+                <div>\
+                    <h4>Who is me?</h4>\
+                    <div class=\"contentarea\">\
+                        <!--\
+                        <ul class=\"linklist\">\
+                            <li><a href=\"#\">Db - MySQLi Wrapper</a></li>                        \
+                            <li><a href=\"#\">Pdf Page - Zend_Pdf_Page Wrapper</a></li>        \
+                        </ul>\
+                        -->\
+                    </div>\
+                </div>\
+            </div>\
+        </div>\
+        ");
+
+        return html;
+    }
+
+    static string footer() {
+        string html;
+        html.append("<div id=\"footer\">\
+            <div class=\"left\">&copy; 2009 Gorilla Labs. All rights reserved.</div>\
+            <div class=\"right\">Code Monkey likes his Fritos... Code Monkey likes Toa &amp; Mountain Dew</div>\
+        </div>\
+        </div>\
+        </body>\
+        </html>\
+        ");
+        return html;
+    }
+};
+
+class AdminTemplate {
+public:
+
+    static string header(const char* page_title) {
+        return AdminTemplate::header(page_title, "home", false);
+    }
+    
+    static string header(const char* page_title, bool logged_in) {
+        return AdminTemplate::header(page_title, "home", logged_in);
+    }
+
+    static string header(const char* page_title, const char* nav_item, bool logged_in) {
+        string title = page_title;
+        string html;
+        html.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
+        <html>\
+        <head>\
+            <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\" />\
+            <title>" + title + "</title>\
+            <meta name=\"keywords\" content=\"\" />\
+            <meta name=\"description\" content=\"\" />\
+            <link rel=\"stylesheet\" type=\"text/css\" href=\"http://www.gorilla3d.com/labs/default.css\" />\
+        </head>\
+        <body>\
+        <div id=\"outer\">\
+            <div id=\"header\">\
+            <div id=\"headercontent\">\
+                <h1>Gorilla<sup>Labs</sup></h1>\
+                <h2>Documenting my projects</h2>\
+            </div>\
+    </div>\
+    <div id=\"menu\">\
+            <ul>\
+        ");
+
+        if (nav_item == "dashboard") {
+            html.append("<li><a href=\"/admin/dashboard\" class=\"active\">Dashboard</a></li>");
+        } else {
+            html.append("<li><a href=\"/admin/dashboard\">Dashboard</a></li>");
+        }
+
+        if (nav_item == "blog-posts") {
+            html.append("<li><a href=\"/admin/blog-posts\" class=\"active\">Posts</a></li>");
+        } else {
+            html.append("<li><a href=\"/admin/blog-posts\">Posts</a></li>");
+        }
+
+        if (nav_item == "blog-comments") {
+            html.append("<li><a href=\"/admin/blog-comments\" class=\"active\">Comments</a></li>");
+        } else {
+            html.append("<li><a href=\"/admin/blog-comments\">Comments</a></li>");
+        }
+        
+        if (logged_in == true) {
+            html.append("<li><a href=\"/admin/logout\">logout</a></li>");
+        } else {
+            html.append("<li><a href=\"/admin\">login</a></li>");
+        }
+        
+        html.append("\
+            </ul>\
+    </div>\
+        ");
+        return html;
+    }
+
+    static string post(const char* post_title, const char* post_content, const char* post_date) {
+        string html;
+        string title = post_title;
+        string date = post_date;
+        string content = post_content;
+        html.append("\
+            <div class=\"post\">\
+                <h4>" + title + "</h4>\
+                <div class=\"contentarea\">\
+                    <div class=\"details\">Posted on " + date + "</div>    \
+                    " + content + "\
+                </div>\
+            </div>\
+            <div class=\"divider2\"></div>\
+        ");
+        return html;
+    }
+
+    static string login(string username, string password, string error) {
+        string html;
+        html.append("\
+            <div class=\"post\">\
+                <h4>Admin Login</h4>\
+                <div class=\"contentarea\">\
+                    " + error + "\
+                    <form action=\"/admin/login\" method=\"post\">\
+                    Username: <input name=\"username\" value=\"" + username + "\" class=\"input\" /> \
+                    Password: <input name=\"password\" value=\"" + password + "\" class=\"input\" type=\"password\" /> \
+                    <input value=\"Login\" class=\"submit\" type=\"submit\" /> \
+                    </form>\
+                </div>\
+            </div>\
+            <div class=\"divider2\"></div>\
+        ");
+        return html;
+    }
+
+    static string search_posts(string query) {
+        string html;
+        html.append("\
+            <div class=\"post\">\
+                <h4>Admin Login</h4>\
+                <div class=\"contentarea\">\
+                    <form action=\"/admin/blog-posts\" method=\"get\">\
+                    Query: <input name=\"query\" value=\"" + query + "\" class=\"input\" /> \
+                    <input value=\"Search\" class=\"submit\" type=\"submit\" /> \
+                    </form>\
+                </div>\
+            </div>\
+            <div class=\"divider2\"></div>\
+        ");
+        return html;
+    }
+
+    static string content(string content) {
+        return AdminTemplate::content(content.c_str());
+    }
+
+    static string content(const char* content) {
+        string html;
+
+        string posts = content;
+
+        html.append("\
+        <div id=\"content\">\
+            <div id=\"primarycontainer\">\
+                <div id=\"primarycontent\">\
+                    " + posts + "\
+                </div>\
+            </div>\
+            <div id=\"secondarycontent\">\
+                <div>\
+                    <h4>Who is me?</h4>\
+                    <div class=\"contentarea\">\
+                        <!--\
+                        <ul class=\"linklist\">\
+                            <li><a href=\"#\">Db - MySQLi Wrapper</a></li>                        \
+                            <li><a href=\"#\">Pdf Page - Zend_Pdf_Page Wrapper</a></li>        \
+                        </ul>\
+                        -->\
+                    </div>\
+                </div>\
+            </div>\
+        </div>\
+        ");
+
+        return html;
+    }
+
+    static string footer() {
+        string html;
+        html.append("<div id=\"footer\">\
+            <div class=\"left\">&copy; 2009 Gorilla Labs. All rights reserved.</div>\
+            <div class=\"right\">Code Monkey likes his Fritos... Code Monkey likes Toa &amp; Mountain Dew</div>\
+        </div>\
+        </div>\
+        </body>\
+        </html>\
+        ");
+        return html;
+    }
+};
+
+class HomeController : public WebController {
+public:
+
+    void get() {
+        this->response->body.append(G3DTemplate::header("Gorilla Labs"));
+        string content;
+        content = G3DTemplate::post("Hello World", "something", "You are running G3D Webserver 0.1a.");
+        content = G3DTemplate::content(content);
+        this->response->body.append(content);
+        this->response->body.append(G3DTemplate::footer());
+    }
+};
+
+class AdminController : public WebController {
+public:
+
+    void get() {
+        string content;
+    	string admin_id = this->session->get("admin_id");
+    	bool logged_in = false;
+    	
+    	if (admin_id.length() > 0) {
+    		logged_in = true;
+    	}
+    	
+        this->response->body.append(AdminTemplate::header("Admin | Gorilla Labs", "home", logged_in));
+
+        content = "you are already logged in";
+        if (!logged_in) {
+            content = AdminTemplate::content(
+                AdminTemplate::login(
+                    this->request->get("username"),
+                    this->request->get("password"),
+                    this->request->get("error")
+                )
+            );
+        } else {
+		    this->response->setStatus(302);
+			this->response->setHeader("location", "Location: /admin/blog-posts");
+        }
+        
+        this->response->body.append(content);
+        this->response->body.append(AdminTemplate::footer());
+    }
+};
+
+class AdminDashboardController : public WebController {
+public:
+
+    void get() {
+        string content;
+    	string admin_id = this->session->get("admin_id");
+    	bool logged_in = false;
+    	
+    	if (admin_id.length() > 0) {
+    		logged_in = true;
+    	}
+
+        if (!logged_in) {
+		    this->response->setStatus(302);
+			this->response->setHeader("location", "Location: /admin");
+        }
+        
+        this->response->body.append(AdminTemplate::header("Blog Posts | Admin | Gorilla Labs", "dashboard", logged_in));
+        content.append("TODO");
+        
+        this->response->body.append(content);
+        this->response->body.append(AdminTemplate::footer());
+    }
+};
+
+class AdminBlogCommentController : public WebController {
+public:
+
+    void get() {
+        string content;
+    	string admin_id = this->session->get("admin_id");
+    	bool logged_in = false;
+    	
+    	if (admin_id.length() > 0) {
+    		logged_in = true;
+    	}
+
+        if (!logged_in) {
+		    this->response->setStatus(301);
+			this->response->setHeader("location", "Location: /admin");
+        }
+        
+        this->response->body.append(AdminTemplate::header("Blog Posts | Admin | Gorilla Labs", "blog-comments", logged_in));
+        content.append("TODO");
+        
+        this->append(content);
+        this->append(AdminTemplate::footer());
+    }
+};
+
+
+
+class AdminLoginController : public WebController {
+public:
+
+    void get() {
+        const char* location;
+        
+        if (this->session->get("admin_id") != "") {
+            location = "Location: /admin/blog-posts";
+        } else {
+            if (this->request->type == "POST") {
+                if(this->request->get("username") == "admin" && this->request->get("password") == "admin") {
+            		location = "Location: /admin/blog-posts";
+                } else {
+            		location = "Location: /admin?error=Your+username+or+password+is+wrong.";
+                }
+            }
+        }
+        
+        this->response->setStatus(301);
+	    this->response->setHeader("location", location);
+    }
+};
+
+class AdminLogoutController : public WebController {
+public:
+
+    void get() {
+        this->session->set("admin_id", "");
+        
+        this->response->setStatus(301);
+	    this->response->setHeader("location", "Location: /admin");
+    }
+};
+
+class AdminBlogPostController : public WebController {
+public:
+
+    void get() {
+    	string admin_id = this->session->get("admin_id");
+    	bool logged_in = false;
+    	
+    	if (admin_id.length() > 0) {
+    		logged_in = true;
+    	}
+
+        if (!logged_in) {
+		    this->response->setStatus(301);
+			this->response->setHeader("location", "Location: /admin");
+        } 
+    	
+        this->append(AdminTemplate::header("Blog Posts | Admin | Gorilla Labs", "blog-posts", logged_in));
+        
+        sqlite3* db;
+        string content;
+        int failed = sqlite3_open("testDB.sql", &db);
+
+        if (failed == 0) {
+            string title = "%" + this->request->get("query") + "%";
+
+            SqlQuery stmt = SqlQuery(&db);
+            stmt.query("SELECT * FROM blog_entries WHERE title LIKE ? LIMIT 100");
+            stmt.bind(title);
+            stmt.fetchAll();
+
+			content.append(AdminTemplate::search_posts(this->request->get("query")));
+
+            if (stmt.failed) {
+                content.append("Failed to query: " + this->intToString(stmt.failed));
+            } else {
+                int row_size = stmt.rows.size();
+                content.append("Total Rows: " + this->intToString(row_size) + "<br />");
+
+                for (int i = 0; i < row_size; i++) {
+                    SqlRow row = stmt.rows[i];
+                    content.append("blog title = " + row.get("title") + "<br />");
+                    content.append("<hr />");
+                }
+            }
+            sqlite3_close(db);
+        } else {
+            content.append("Uhh cant open!");
+        }
+        
+        this->append(content);
+        this->append(AdminTemplate::footer());
+    }
+};
+
+int main(int argc, char* argv[]) {
+
+    WebServer* server = new WebServer();
+
+    server->port = 8181;
+    server->addController("/", new HomeController());
+    server->addController("/admin", new AdminController());
+    server->addController("/admin/login", new AdminLoginController());
+    server->addController("/admin/logout", new AdminLogoutController());
+    server->addController("/admin/dashboard", new AdminDashboardController());
+    server->addController("/admin/blog-posts", new AdminBlogPostController());
+    server->addController("/admin/blog-comments", new AdminBlogCommentController());
+
+    server->run();
+    delete server;
+    return 0;
+}
