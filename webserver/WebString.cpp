@@ -106,3 +106,34 @@ std::string WebString::wordwrap(int width) {
     }
     return sentence;
 }
+
+std::vector<std::string> WebString::explode(std::string delimiter) {
+    std::vector<std::string> string_array;
+    std::string data = this->data;
+    int found;
+    found = data.find_first_of(delimiter);
+    while(found != std::string::npos){
+        if(found > 0){
+            string_array.push_back(data.substr(0, found));
+        }
+        data = data.substr(found + 1);
+        found = data.find_first_of(delimiter);
+    }
+    if(data.length() > 0){
+        string_array.push_back(data);
+    }
+    
+    return string_array;
+}
+
+std::string WebString::implode(std::string delimiter, std::vector<std::string> segments) {
+    std::string result;
+    for (int i=0; i < segments.size(); i++) {
+        result += segments[i];
+        if (i + 1 != segments.size()) {
+            result += delimiter;
+        }
+    }
+    
+    return result;
+}

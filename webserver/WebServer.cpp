@@ -61,8 +61,10 @@ void WebServer::run() {
                     }
                     data += buff;
                 }
-                //std::cout << data << std::endl;
+                std::cout << data << std::endl;
                 uri = request->parseHeader(data);
+                
+                std::cout << "CONTENT_TYPE:" << request->get("Content-Type") << std::endl;
 
                 // Create or Load Session
                 WebSession session = WebSession(request, response);

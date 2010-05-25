@@ -61,6 +61,12 @@ namespace admin {
             html.append("<li><a href=\"/admin/blog-comments\">Comments</a></li>");
         }
 
+        if (nav_item == "upload-example") {
+            html.append("<li><a href=\"/admin/upload-example\" class=\"active\">Upload Example</a></li>");
+        } else {
+            html.append("<li><a href=\"/admin/upload-example\">Upload Example</a></li>");
+        }
+
         if (logged_in == true) {
             html.append("<li><a href=\"/admin/logout\">logout</a></li>");
         } else {

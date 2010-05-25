@@ -59,6 +59,20 @@ std::string WebSession::get(std::string key) {
     return value;
 }
 
+void WebSession::unset(const char* key) {
+    std::string stdkey = key;
+    this->unset(stdkey);
+}
+
+void WebSession::unset(std::string key) {
+    ParamMap::iterator iter;
+    std::string value;
+    iter = this->params.find(key);
+    if (iter != this->params.end()) {
+        this->params.erase(iter);
+    }
+}
+
 void WebSession::set(std::string key, std::string value) {
     this->params.insert(std::make_pair(key, value));
 }

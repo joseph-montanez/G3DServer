@@ -23,6 +23,8 @@ class WebSession {
         std::string get(std::string);
         std::string get(const char*);
         void set(std::string, std::string);
+        void unset(std::string);
+        void unset(const char*);
         std::string getId();
         void setId(std::string);
         void generateId();

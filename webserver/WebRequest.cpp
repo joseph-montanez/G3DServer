@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <iostream>
 #include <map>
 #include "WebRequest.h"
@@ -8,6 +9,59 @@ WebRequest::WebRequest() {
 }
 
 WebRequest::~WebRequest() {
+}
+
+void WebRequest::parseHttpHeader() {
+    // This is a revamp of parseHeader() to allow file uploads (because its dirty!)
+    std::string uri, q, k, v, buffer, data;
+    std::vector<std::string> segments;
+    std::vector<std::string> string_array;
+    std::string delimiter = "\n";
+    WebString ws = WebString(this->head);
+    
+    segments = ws.explode(delimiter);
+    for (int i=0; i < segments.size(); i++) {
+        if(i == 0)
+        {
+            // This is the first line that hold GET / POST and Protocal
+        }
+        else if (i + 1 == segments.size())
+        {
+            // This is the last line and might be a file uploaded.
+        }
+        else
+        {
+            /*
+            string_array = this->parseHttpSegment(segments[i]);
+            std::cout << "Part 1: " << string_array[0] << std::endl;
+            std::cout << "Part 2: " << string_array[1] << std::endl;
+            */
+        }
+        std::cout << "Segment: " << segments[i] << std::endl;
+    }
+}
+
+std::vector<std::string> parseHttpSegment(std::string data) {
+    WebString ws = WebString(data);
+    std::vector<std::string> segments = ws.explode(":");
+    std::string key = "";
+    std::string value = "";
+    if(segments.size() > 1)
+    {
+        key = segments[0];
+        segments.erase(segments.begin());
+    }
+    
+    if(segments.size() > 0)
+    {
+        ws = WebString("");
+        value = ws.implode(":", segments);
+    }
+    
+    std::vector<std::string> string_array;
+    string_array.push_back(key);
+    string_array.push_back(value);
+    return string_array;
 }
 
 void WebRequest::parseCookies() {
@@ -66,6 +120,7 @@ std::string WebRequest::parseHeader(std::string data) {
         return uri;
     }
     this->parseCookies();
+    this->parseHttpHeader();
     //std::cout << this->head;
     stub_begin = this->head.find("GET");
     this->type = "GET";
@@ -120,9 +175,9 @@ std::string WebRequest::parseHeader(std::string data) {
         q = this->head.substr(stub_begin + 4, stub_length);
     }
 
-    //std::cout <<  "Type: " + this->type + "\n" << std::endl;
-    //std::cout <<  "URI: " + uri + "\n" << std::endl;
-    //std::cout <<  "Query: " + q + "\n" << std::endl;
+    std::cout <<  "Type: " + this->type + "\n" << std::endl;
+    std::cout <<  "URI: " + uri + "\n" << std::endl;
+    std::cout <<  "Query: " + q + "\n" << std::endl;
 
     while (true) {
         stub_length = q.length();

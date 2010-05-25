@@ -37,6 +37,7 @@
 #include "admin/dashboard.cpp"
 #include "admin/blog/posts.cpp"
 #include "admin/blog/comments.cpp"
+#include "admin/upload/form.cpp"
 
 int main(int argc, char* argv[]) {
 
@@ -50,6 +51,7 @@ int main(int argc, char* argv[]) {
     server->addController("/admin/dashboard", new admin::DashboardController());
     server->addController("/admin/blog-posts", new admin::blog::PostController());
     server->addController("/admin/blog-comments", new admin::blog::CommentController());
+    server->addController("/admin/upload-example", new admin::upload::FormController());
 
     server->run();
     delete server;

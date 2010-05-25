@@ -10,7 +10,7 @@ namespace admin {
     public:
 
         void get() {
-            this->session->set("admin_id", "");
+            this->session->unset("admin_id");
 
             this->response->setStatus(301);
             this->response->setHeader("location", "Location: /admin");

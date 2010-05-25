@@ -10,6 +10,7 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -25,6 +26,8 @@ public:
     std::string uppercase();
     std::string urlDecode();
     std::string wordwrap(int width);
+    std::vector<std::string> explode(std::string delimiter); 
+    std::string implode(std::string delimiter, std::vector<std::string> segments); 
     int toInt();
     static int toInt(std::string number);
     static std::string fromInt(int number);
