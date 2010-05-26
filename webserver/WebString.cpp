@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <functional>
 #include <cctype>
+#include <iostream>
 
 #include "WebString.h"
 std::ostream& operator<<(std::ostream& output, const WebString& data) {
@@ -134,6 +135,27 @@ std::string WebString::implode(std::string delimiter, std::vector<std::string> s
             result += delimiter;
         }
     }
+    
+    return result;
+}
+
+std::string WebString::trim() {
+    std::string result(this->data);
+    
+    int i,j,start,end;
+
+    //ltrim
+    for (i=0; (result[i] != 0 && result[i] <= 32);) {
+        i++;
+    }
+    start = i;
+
+    //rtrim
+    for (i = 0,j = 0; result[i] != 0; i++) {
+        j = ((result[i] <= 32) ? j + 1 : 0);
+    }
+    end = i - j;
+    result = result.substr(start, end - start);
     
     return result;
 }

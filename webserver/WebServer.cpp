@@ -50,6 +50,7 @@ void WebServer::run() {
                 std::string uri;
                 data = "";
                 status = MAXRECV;
+                // TODO: I need to parse the http header before I read everything.
                 while (status == MAXRECV) {
                     buff = "";
                     status = client >> buff;
@@ -60,11 +61,12 @@ void WebServer::run() {
                         }
                     }
                     data += buff;
+                    std::cout << "reading ..." << std::endl;
                 }
                 std::cout << data << std::endl;
                 uri = request->parseHeader(data);
                 
-                std::cout << "CONTENT_TYPE:" << request->get("Content-Type") << std::endl;
+                std::cout << "CONTENT_TYPE:" << request->getHeader("Content-Type") << std::endl;
 
                 // Create or Load Session
                 WebSession session = WebSession(request, response);
@@ -88,11 +90,13 @@ void WebServer::run() {
                     controller->response->setStatus(404);
                     controller->response->body.append("<h1>Page Not Found</h1>404");
                 }
-                //std::cout << controller->response->toString() << std::endl;
+                std::cout << controller->response->toString() << std::endl;
+                std::cout << "writting ..." << std::endl;
                 client << controller->response->toString();
+                
                 delete request;
                 delete response;
-
+                
                 // TODO: sessions shouldn't always be inited by the server ~_~
                 this->sessions[session.id] = session;
 

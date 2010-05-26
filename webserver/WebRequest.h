@@ -14,9 +14,10 @@ public:
     ~WebRequest();
     std::string parseHeader(std::string data);
     void parseCookies();
-    void parseHttpHeader();
     std::vector<std::string> parseHttpSegment(std::string data);
+    void parseHttpHeader();
     std::string get(std::string key);
+    std::string getHeader(std::string key);
     std::string getCookie(std::string key);
     std::string head;
     std::string uri;

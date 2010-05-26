@@ -144,7 +144,6 @@ std::string WebResponse::toString() {
         #ifdef __x86_64__
         unsigned long body_size = (unsigned long) body.size();
         sprintf(clen, "Content-Length: %lu", body.size());
-        std::cout << "64!" << std::endl;
         #else
         sprintf(clen, "Content-Length: %i", body.size());
         #endif

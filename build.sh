@@ -1,4 +1,6 @@
 #!/bin/bash
+set +x
+
 webserver_folder="webserver"
 webserver_files=(
     "ServerSocket.cpp"
@@ -19,7 +21,7 @@ mkdir -p "${webserver_folder}/build"
 webserver_shared_files=""
 for name in ${webserver_files[@]}
 do
-    g++ -g -fPIC -c "${webserver_folder}/${name}" -o "${webserver_folder}/build/${name%.cpp}.o"
+    g++ -fPIC -c "${webserver_folder}/${name}" -o "${webserver_folder}/build/${name%.cpp}.o"
     webserver_shared_files="${webserver_shared_files} ${webserver_folder}/build/${name%.cpp}.o"
 done
 
@@ -48,10 +50,10 @@ shared_files=""
 for name in ${website_files[@]}
 do
     mkdir -p "${website_folder}/build/${name%\/*}"
-    g++ -fPIC -c "${website_folder}/${name}" -o "${website_folder}/build/${name%.cpp}.o"
+    g++ -c "${website_folder}/${name}" -o "${website_folder}/build/${name%.cpp}.o"
     shared_files="${shared_files} ${website_folder}/build/${name%.cpp}.o"
 done
 
 # Generate website executable
 mkdir -p "${website_folder}/dist"
-g++ -Wall -lpthread -lsqlite3 -o "${website_folder}/dist/website" $webserver_shared_files $shared_files
+g++ -lpthread -lsqlite3 -o "${website_folder}/dist/website" $webserver_shared_files $shared_files

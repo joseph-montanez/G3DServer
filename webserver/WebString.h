@@ -31,6 +31,7 @@ public:
     int toInt();
     static int toInt(std::string number);
     static std::string fromInt(int number);
+    std::string trim();
 
     std::string data;
 };

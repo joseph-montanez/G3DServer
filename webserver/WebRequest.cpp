@@ -11,37 +11,7 @@ WebRequest::WebRequest() {
 WebRequest::~WebRequest() {
 }
 
-void WebRequest::parseHttpHeader() {
-    // This is a revamp of parseHeader() to allow file uploads (because its dirty!)
-    std::string uri, q, k, v, buffer, data;
-    std::vector<std::string> segments;
-    std::vector<std::string> string_array;
-    std::string delimiter = "\n";
-    WebString ws = WebString(this->head);
-    
-    segments = ws.explode(delimiter);
-    for (int i=0; i < segments.size(); i++) {
-        if(i == 0)
-        {
-            // This is the first line that hold GET / POST and Protocal
-        }
-        else if (i + 1 == segments.size())
-        {
-            // This is the last line and might be a file uploaded.
-        }
-        else
-        {
-            /*
-            string_array = this->parseHttpSegment(segments[i]);
-            std::cout << "Part 1: " << string_array[0] << std::endl;
-            std::cout << "Part 2: " << string_array[1] << std::endl;
-            */
-        }
-        std::cout << "Segment: " << segments[i] << std::endl;
-    }
-}
-
-std::vector<std::string> parseHttpSegment(std::string data) {
+std::vector<std::string> WebRequest::parseHttpSegment(std::string data) {
     WebString ws = WebString(data);
     std::vector<std::string> segments = ws.explode(":");
     std::string key = "";
@@ -62,6 +32,39 @@ std::vector<std::string> parseHttpSegment(std::string data) {
     string_array.push_back(key);
     string_array.push_back(value);
     return string_array;
+}
+
+void WebRequest::parseHttpHeader() {
+    // This is a revamp of parseHeader() to allow file uploads (because its dirty!)
+    std::string uri, q, k, v, buffer, data;
+    std::vector<std::string> segments;
+    std::vector<std::string> string_array;
+    std::string delimiter = "\n";
+    WebString ws = WebString(this->head);
+    
+    segments = ws.explode(delimiter);
+    for (int i=0; i < segments.size(); i++) {
+        if(i == 0)
+        {
+            // This is the first line that hold GET / POST and Protocal
+        }
+        else if (i + 1 == segments.size())
+        {
+            // This is the last line and might be a file uploaded.
+        }
+        else
+        {
+            WebString wstr = WebString("");
+            string_array = this->parseHttpSegment(segments[i]);
+            
+            wstr.data = string_array[0];
+            std::string key = wstr.trim();
+            wstr.data = string_array[1];
+            std::string value = wstr.trim();
+            
+            this->header[key] = value;
+        }
+    }
 }
 
 void WebRequest::parseCookies() {
@@ -238,6 +241,21 @@ std::string WebRequest::getCookie(std::string key) {
     if(this->cookies.size() != 0) {
         iter = this->cookies.find(key);
         if (iter != this->cookies.end()) {
+            if(!iter->second.empty()) {
+                value = iter->second;
+            }
+        } 
+    }
+    return value;
+}
+
+std::string WebRequest::getHeader(std::string key) {
+    ParamMap::iterator iter;
+    std::string value;
+    value = "";
+    if(this->header.size() != 0) {
+        iter = this->header.find(key);
+        if (iter != this->header.end()) {
             if(!iter->second.empty()) {
                 value = iter->second;
             }
