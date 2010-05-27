@@ -12,6 +12,8 @@ class WebRequest {
 public:
     WebRequest();
     ~WebRequest();
+    static std::string parseType(std::string data);
+    static std::string parseUri(std::string data);
     std::string parseHeader(std::string data);
     void parseCookies();
     std::vector<std::string> parseHttpSegment(std::string data);

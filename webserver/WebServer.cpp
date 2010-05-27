@@ -51,6 +51,27 @@ void WebServer::run() {
                 data = "";
                 status = MAXRECV;
                 // TODO: I need to parse the http header before I read everything.
+                // TODO: Parse the first 500 bytes to get the controller being called.
+                /*
+                    string uri = WebRequest::parseController(data);
+                    
+                    iter = this->controllers->find(uri);
+                    if (iter != this->controllers->end()) {
+                        controller = iter->second;
+                        controller->response = response;
+                        controller->request = request;
+                        controller->session = &session;
+                        controller->get();
+                    } else {
+                        // If the controller is not found stop asking for data 
+                        // server 404 and close the connection.
+                        controller = new WebController();
+                        controller->response = response;
+                        controller->request = request;
+                        controller->response->setStatus(404);
+                        controller->response->body.append("<h1>Page Not Found</h1>404");
+                    }
+                */
                 while (status == MAXRECV) {
                     buff = "";
                     status = client >> buff;
@@ -61,12 +82,19 @@ void WebServer::run() {
                         }
                     }
                     data += buff;
-                    std::cout << "reading ..." << std::endl;
+                    std::cout << "uri: " << WebRequest::parseUri(data) << std::endl;
+                    //std::cout << "reading ..." << std::endl;
                 }
-                std::cout << data << std::endl;
+                //std::cout << data << std::endl;
                 uri = request->parseHeader(data);
-                
-                std::cout << "CONTENT_TYPE:" << request->getHeader("Content-Type") << std::endl;
+                //std::cout << "CONTENT_TYPE:" << request->getHeader("Content-Type") << std::endl;
+                /*
+                for(ParamMap::const_iterator it = request->header.begin(); it != request->header.end(); ++it)
+                {
+                    std::cout << "Key: '" << it->first << "'" << std::endl;
+                    std::cout << "Value: " << it->second << "'" << std::endl;
+                }
+                */
 
                 // Create or Load Session
                 WebSession session = WebSession(request, response);
@@ -90,8 +118,8 @@ void WebServer::run() {
                     controller->response->setStatus(404);
                     controller->response->body.append("<h1>Page Not Found</h1>404");
                 }
-                std::cout << controller->response->toString() << std::endl;
-                std::cout << "writting ..." << std::endl;
+                //std::cout << controller->response->toString() << std::endl;
+                //std::cout << "writting ..." << std::endl;
                 client << controller->response->toString();
                 
                 delete request;
@@ -101,10 +129,10 @@ void WebServer::run() {
                 this->sessions[session.id] = session;
 
             } catch (SocketException& e) {
-                std::cout << "Exception was caught:" << e.description() << "\nExiting.\n";
+                //std::cout << "Exception was caught:" << e.description() << "\nExiting.\n";
             }
         }
     } catch (SocketException& e) {
-        std::cout << "Exception was caught:" << e.description() << "\nExiting.\n";
+        //std::cout << "Exception was caught:" << e.description() << "\nExiting.\n";
     }
 }

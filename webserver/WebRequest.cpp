@@ -44,26 +44,21 @@ void WebRequest::parseHttpHeader() {
     
     segments = ws.explode(delimiter);
     for (int i=0; i < segments.size(); i++) {
-        if(i == 0)
-        {
-            // This is the first line that hold GET / POST and Protocal
+        ws = WebString(segments[i]);
+        segments[i] = ws.trim();
+        
+        if (segments[i].empty()) {
+            return;
         }
-        else if (i + 1 == segments.size())
-        {
-            // This is the last line and might be a file uploaded.
-        }
-        else
-        {
-            WebString wstr = WebString("");
-            string_array = this->parseHttpSegment(segments[i]);
-            
-            wstr.data = string_array[0];
-            std::string key = wstr.trim();
-            wstr.data = string_array[1];
-            std::string value = wstr.trim();
-            
-            this->header[key] = value;
-        }
+        WebString wstr = WebString("");
+        string_array = this->parseHttpSegment(segments[i]);
+        
+        wstr.data = string_array[0];
+        std::string key = wstr.trim();
+        wstr.data = string_array[1];
+        std::string value = wstr.trim();
+        
+        this->header[key] = value;
     }
 }
 
@@ -111,6 +106,48 @@ void WebRequest::parseCookies() {
         }
         q = q.substr(stub_end, stub_length);
     }
+}
+
+static std::string WebRequest::parseUri(std::string data) {
+    std::string uri = "";
+    int stub_length, stub_begin, stub_end;
+    
+    stub_length = data.length();
+    if (stub_length == 0) {
+        return "";
+    }
+    
+    stub_begin = data.find("GET");
+    if (stub_begin == -1) {
+        /* This is a Post? */
+        stub_begin = data.find("POST");
+    }
+    if (stub_begin == -1) {
+        return "";
+    }
+    
+    stub_end = data.substr(stub_begin, stub_length).find("\n");
+    if (stub_begin > -1 && stub_end > -1) {
+        uri = data.substr(stub_begin, stub_end);
+    }
+    
+    return uri;
+}
+
+static std::string WebRequest::parseType(std::string data) {
+    int hasType = data.find("GET");
+    std::string type = "GET";
+    
+    if (hasType == -1) {
+        hasType = data.find("POST");
+        type = "POST";
+    }
+    
+    if (hasType == -1) {
+        type = "";
+    }
+    
+    return type;
 }
 
 std::string WebRequest::parseHeader(std::string data) {
@@ -178,9 +215,9 @@ std::string WebRequest::parseHeader(std::string data) {
         q = this->head.substr(stub_begin + 4, stub_length);
     }
 
-    std::cout <<  "Type: " + this->type + "\n" << std::endl;
-    std::cout <<  "URI: " + uri + "\n" << std::endl;
-    std::cout <<  "Query: " + q + "\n" << std::endl;
+    //std::cout <<  "Type: " + this->type + "\n" << std::endl;
+    //std::cout <<  "URI: " + uri + "\n" << std::endl;
+    //std::cout <<  "Query: " + q + "\n" << std::endl;
 
     while (true) {
         stub_length = q.length();
@@ -259,7 +296,7 @@ std::string WebRequest::getHeader(std::string key) {
             if(!iter->second.empty()) {
                 value = iter->second;
             }
-        } 
+        }
     }
     return value;
 }
