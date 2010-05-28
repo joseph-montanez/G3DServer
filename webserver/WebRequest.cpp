@@ -110,26 +110,22 @@ void WebRequest::parseCookies() {
 
 std::string WebRequest::parseUri(std::string data) {
     std::string uri = "";
-    int stub_length, stub_begin, stub_end;
+    std::string delimiter = "/";
+    std::vector<std::string> segments;
     
-    stub_length = data.length();
-    if (stub_length == 0) {
-        return "";
-    }
+    // Take out the GET/POST
+    WebString ws = WebString(data);
+    segments     = ws.explode(delimiter);
+    segments.erase(segments.begin());
     
-    stub_begin = data.find("GET");
-    if (stub_begin == -1) {
-        /* This is a Post? */
-        stub_begin = data.find("POST");
-    }
-    if (stub_begin == -1) {
-        return "";
-    }
     
-    stub_end = data.substr(stub_begin, stub_length).find("\n");
-    if (stub_begin > -1 && stub_end > -1) {
-        uri = data.substr(stub_begin, stub_end);
-    }
+    uri      = ws.implode(delimiter, segments);
+    ws       = WebString(uri);
+    ws.trim();
+    
+    // Get the first element and this is the URI
+    segments = ws.explode(" ");
+    uri      = "/" + segments.front();
     
     return uri;
 }
@@ -184,7 +180,10 @@ std::string WebRequest::parseHeader(std::string data) {
         return uri;
     }
     stub_begin = uri.find("/");
-    stub_end = uri.substr(stub_begin, stub_length).find(" ");
+    stub_end   = -1;
+    if(stub_begin != -1) {
+        stub_end = uri.substr(stub_begin, stub_length).find(" ");
+    }
     if (stub_begin > -1 && stub_end > -1) {
         uri = uri.substr(stub_begin, stub_end);
     }
@@ -215,38 +214,9 @@ std::string WebRequest::parseHeader(std::string data) {
         q = this->head.substr(stub_begin + 4, stub_length);
     }
 
-    //std::cout <<  "Type: " + this->type + "\n" << std::endl;
-    //std::cout <<  "URI: " + uri + "\n" << std::endl;
-    //std::cout <<  "Query: " + q + "\n" << std::endl;
-
-    while (true) {
-        stub_length = q.length();
-        if (stub_length == 0) {
-            break;
-        }
-        stub_begin = q.find("=");
-        stub_end = q.find("&");
-
-        if (stub_end == -1) {
-            stub_end = stub_length;
-        }
-
-        if (stub_begin > -1 && stub_end > -1) {
-            buffer = q.substr(0, stub_end);
-            v = "";
-            k = "";
-            if (stub_begin > -1) {
-                k = q.substr(0, stub_begin);
-                v = buffer.substr(buffer.find("=") + 1, buffer.length());
-            } else {
-                k = q;
-            }
-            this->params[k] = v;
-        }
-        if (stub_end != stub_length) {
-            stub_end++;
-        }
-        q = q.substr(stub_end, stub_length);
+    if(q.length() > 0) {
+        WebString ws = WebString(q);
+        this->params = ws.parseParams();
     }
 
     // Iterate through each parameter and url decode them

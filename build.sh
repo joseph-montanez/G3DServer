@@ -21,13 +21,13 @@ mkdir -p "${webserver_folder}/build"
 webserver_shared_files=""
 for name in ${webserver_files[@]}
 do
-    g++ -fPIC -c "${webserver_folder}/${name}" -o "${webserver_folder}/build/${name%.cpp}.o"
+    g++ -fPIC -c -g "${webserver_folder}/${name}" -o "${webserver_folder}/build/${name%.cpp}.o"
     webserver_shared_files="${webserver_shared_files} ${webserver_folder}/build/${name%.cpp}.o"
 done
 
 # Generate webserver shared library
 mkdir -p "${webserver_folder}/dist"
-g++ -shared -o "${webserver_folder}/dist/libwebserver.so" $webserver_shared_files
+g++ -shared -o -g "${webserver_folder}/dist/libwebserver.so" $webserver_shared_files
 
 website_folder="website"
 website_files=(
@@ -50,10 +50,10 @@ shared_files=""
 for name in ${website_files[@]}
 do
     mkdir -p "${website_folder}/build/${name%\/*}"
-    g++ -c "${website_folder}/${name}" -o "${website_folder}/build/${name%.cpp}.o"
+    g++ -c -g "${website_folder}/${name}" -o "${website_folder}/build/${name%.cpp}.o"
     shared_files="${shared_files} ${website_folder}/build/${name%.cpp}.o"
 done
 
 # Generate website executable
 mkdir -p "${website_folder}/dist"
-g++ -lpthread -lsqlite3 -o "${website_folder}/dist/website" $webserver_shared_files $shared_files
+g++ -g -lpthread -lsqlite3 -o "${website_folder}/dist/website" $webserver_shared_files $shared_files

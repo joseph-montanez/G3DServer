@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -32,6 +33,7 @@ public:
     static int toInt(std::string number);
     static std::string fromInt(int number);
     std::string trim();
+    std::map<std::string, std::string> parseParams();
 
     std::string data;
 };

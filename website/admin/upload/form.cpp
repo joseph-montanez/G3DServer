@@ -20,7 +20,8 @@ namespace admin {
                 this->response->body.append(admin::layout::header("Example Uploading | Admin | Gorilla Labs", "blog-comments", true));
                 content.append("\
                     <form method=\"post\" enctype=\"multipart/form-data\">\
-                        <input type=\"file\" name=\"file\" />\
+                        <input type=\"file\" name=\"file1\" />\
+                        <input type=\"file\" name=\"file2\" />\
                         <input type=\"submit\" value=\"Upload\" />\
                     </form>\
                 ");

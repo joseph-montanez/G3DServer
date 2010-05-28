@@ -14,6 +14,9 @@ void WebController::append(const char* content) {
 }
 
 void WebController::post() {}
+void WebController::onMultipartPost() {}
+void WebController::onStartup() {}
+
 std::string WebController::intToString(int i) {
     std::string s;
     std::stringstream out;

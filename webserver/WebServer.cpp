@@ -9,6 +9,7 @@
 #include "WebController.h"
 #include "WebSession.h"
 #include "WebServer.h"
+#include "WebString.h"
 #include <ctime>
 #include <cstdlib>
 
@@ -27,7 +28,7 @@ void WebServer::addController(std::string uri, WebController* controller) {
 
 void WebServer::run() {
     std::string data, buff;
-    int status, isLoaded;
+    int status, isLoaded, hasBoundary;
     unsigned int nth;
     size_t found;
 
@@ -46,55 +47,93 @@ void WebServer::run() {
                 WebRequest* request = new WebRequest();
                 WebResponse* response = new WebResponse();
                 WebController* controller;
-                std::map<std::string, WebController*>::iterator iter;
+                std::map<std::string, WebController*>::iterator iter = this->controllers->end();;
                 std::string uri;
                 data = "";
                 status = MAXRECV;
-                // TODO: I need to parse the http header before I read everything.
-                // TODO: Parse the first 500 bytes to get the controller being called.
-                /*
-                    string uri = WebRequest::parseController(data);
-                    
-                    iter = this->controllers->find(uri);
-                    if (iter != this->controllers->end()) {
-                        controller = iter->second;
-                        controller->response = response;
-                        controller->request = request;
-                        controller->session = &session;
-                        controller->get();
-                    } else {
-                        // If the controller is not found stop asking for data 
-                        // server 404 and close the connection.
-                        controller = new WebController();
-                        controller->response = response;
-                        controller->request = request;
-                        controller->response->setStatus(404);
-                        controller->response->body.append("<h1>Page Not Found</h1>404");
-                    }
-                */
+                hasBoundary = 0;
+                
+                std::string type = "";
+                std::string boundary = "";
+                int parseType = 0;
+                int parseUri = 0;
                 while (status == MAXRECV) {
                     buff = "";
                     status = client >> buff;
-                    if (status == 500) {
-                        found = buff.find_last_of("\n");
-                        if (found == 499) {
-                            status = 0;
+                    data += buff;
+                    if (parseType == 0) {
+                        parseType = 1;
+                        type = WebRequest::parseType(data);
+                        if (type == "GET") {
+                        
+                        } else if (type == "POST") {
+                        
+                        } else {
+                            controller = new WebController();
+                            controller->response = response;
+                            controller->request = request;
+                            controller->response->setStatus(404);
+                            controller->response->body.append("<h1>Page Not Found</h1>404");
+                            break;
                         }
                     }
-                    data += buff;
-                    std::cout << "uri: " << WebRequest::parseUri(data) << std::endl;
-                    //std::cout << "reading ..." << std::endl;
+                    
+                    if (data.find_last_of("\r\n\r\n") != std::string::npos && type == "GET") {
+                        status = 0;
+                    }
+                    
+                    // TODO: Allow Max Recieve Limit to be determined by Controller
+                    if (parseUri == 0) {
+                        if (data.find("\r\n") != std::string::npos) {
+                            uri = WebRequest::parseUri(data);
+                            parseUri = 1;
+                        }
+                    }
+                    
+                    if (parseUri == 1) {
+                        iter = this->controllers->find(uri);
+                        if (iter == this->controllers->end()) {
+                            // If the controller is not found stop asking for data 
+                            // server 404 and close the connection.
+                            controller = new WebController();
+                            controller->response = response;
+                            controller->request = request;
+                            controller->response->setStatus(404);
+                            controller->response->body.append("<h1>Page Not Found</h1>404");
+                            //std::cout << "404 START:" << data << ":END 404" << std::endl;
+                            break;
+                        }
+                        parseUri = 2;
+                    }
+                    
+                    if (parseUri == 2 && data.find("\r\n\r\n")) {
+                        request->parseHeader(data);
+                        std::string contentType = request->getHeader("Content-Type");
+                        if(type == "POST" && contentType.find("multipart") != -1) {
+                            WebString ws = WebString(contentType);
+                            std::vector<std::string> segments = ws.explode(";");
+                            segments.erase(segments.begin());
+                            ws = WebString(ws.implode(";", segments));
+                            ws.trim();
+                            boundary = ws.data;
+                            if(boundary.length() > 0) {
+                                ws = WebString(boundary);
+                                segments = ws.explode("=");
+                                segments.erase(segments.begin());
+                                ws = WebString(ws.implode("=", segments));
+                                ws.trim();
+                                boundary = ws.data;
+                            }
+                            if(boundary.length() > 0) {
+                                hasBoundary = 1;
+                                //std::cout << "boundary: " << boundary << std::endl;
+                            }
+                        }
+                        parseUri = 3;
+                    }
                 }
-                //std::cout << data << std::endl;
-                uri = request->parseHeader(data);
-                //std::cout << "CONTENT_TYPE:" << request->getHeader("Content-Type") << std::endl;
-                /*
-                for(ParamMap::const_iterator it = request->header.begin(); it != request->header.end(); ++it)
-                {
-                    std::cout << "Key: '" << it->first << "'" << std::endl;
-                    std::cout << "Value: " << it->second << "'" << std::endl;
-                }
-                */
+                //std::cout << "START:" << data << ":END" << std::endl;
+                request->parseHeader(data);
 
                 // Create or Load Session
                 WebSession session = WebSession(request, response);
@@ -104,20 +143,15 @@ void WebServer::run() {
                 }
 
                 //std::cout << session.id << std::endl;
-                iter = this->controllers->find(uri);
                 if (iter != this->controllers->end()) {
                     controller = iter->second;
                     controller->response = response;
                     controller->request = request;
                     controller->session = &session;
                     controller->get();
-                } else {
-                    controller = new WebController();
-                    controller->response = response;
-                    controller->request = request;
-                    controller->response->setStatus(404);
-                    controller->response->body.append("<h1>Page Not Found</h1>404");
+                    
                 }
+                
                 //std::cout << controller->response->toString() << std::endl;
                 //std::cout << "writting ..." << std::endl;
                 client << controller->response->toString();

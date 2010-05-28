@@ -13,8 +13,8 @@ public:
     virtual void get();
     virtual void append(std::string content);
     virtual void append(const char* content);
-    /*virtual void setHeader();
-    virtual void setStatus();*/
+    virtual void onMultipartPost();
+    virtual void onStartup();
     void post();
     virtual std::string intToString(int i);
     WebRequest* request;

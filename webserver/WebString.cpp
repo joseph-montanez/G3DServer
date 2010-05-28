@@ -42,6 +42,48 @@ std::string WebString::uppercase() {
     return value;
 }
 
+std::map<std::string, std::string> WebString::parseParams() {
+    std::string uri, q, k, v, buffer;
+    q = this->data;
+    std::map<std::string, std::string> params;
+    int stub_length, stub_begin, stub_end;
+    
+    while (true) {
+        stub_length = q.length();
+        
+        if(stub_length == 0) {
+            break;
+        }
+        
+        stub_begin  = q.find("=");
+        stub_end    = q.find("&");
+
+        if (stub_end == -1) {
+            stub_end = stub_length;
+        }
+
+        if (stub_begin > -1 && stub_end > -1) {
+            buffer = q.substr(0, stub_end);
+            v = "";
+            k = "";
+            if (stub_begin > -1) {
+                k = q.substr(0, stub_begin);
+                v = buffer.substr(buffer.find("=") + 1, buffer.length());
+            } else {
+                k = q;
+            }
+            params[k] = v;
+        }
+        if (stub_end != stub_length) {
+            stub_end++;
+        }
+        
+        q = q.substr(stub_end, stub_length);
+    }
+    
+    return params;
+}
+
 std::string WebString::urlDecode() {
     std::string encoded(this->data);
     std::string::size_type index;
