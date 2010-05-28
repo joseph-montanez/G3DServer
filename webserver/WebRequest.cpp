@@ -108,7 +108,7 @@ void WebRequest::parseCookies() {
     }
 }
 
-static std::string WebRequest::parseUri(std::string data) {
+std::string WebRequest::parseUri(std::string data) {
     std::string uri = "";
     int stub_length, stub_begin, stub_end;
     
@@ -134,7 +134,7 @@ static std::string WebRequest::parseUri(std::string data) {
     return uri;
 }
 
-static std::string WebRequest::parseType(std::string data) {
+std::string WebRequest::parseType(std::string data) {
     int hasType = data.find("GET");
     std::string type = "GET";
     
