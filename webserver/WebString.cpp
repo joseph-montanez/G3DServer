@@ -154,13 +154,14 @@ std::vector<std::string> WebString::explode(std::string delimiter) {
     std::vector<std::string> string_array;
     std::string data = this->data;
     int found;
-    found = data.find_first_of(delimiter);
-    while(found != std::string::npos){
-        if(found > 0){
+    found = data.find(delimiter);
+    
+    while (found > -1) {
+        if (found > -1) {
             string_array.push_back(data.substr(0, found));
         }
-        data = data.substr(found + 1);
-        found = data.find_first_of(delimiter);
+        data = data.substr(found + delimiter.length());
+        found = data.find(delimiter);
     }
     if(data.length() > 0){
         string_array.push_back(data);

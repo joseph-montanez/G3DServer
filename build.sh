@@ -7,6 +7,7 @@ webserver_files=(
     "Socket.cpp"
     "SqlQuery.cpp"
     "SqlRow.cpp"
+    "WebBoundary.cpp"
     "WebController.cpp"
     "WebCookie.cpp"
     "WebRequest.cpp"

@@ -28,7 +28,7 @@ void WebServer::addController(std::string uri, WebController* controller) {
 
 void WebServer::run() {
     std::string data, buff;
-    int status, isLoaded, hasBoundary;
+    int status, isLoaded, hasBoundary, startBoundary, endBoundary;
     unsigned int nth;
     size_t found;
 
@@ -52,6 +52,8 @@ void WebServer::run() {
                 data = "";
                 status = MAXRECV;
                 hasBoundary = 0;
+                startBoundary = -1;
+                endBoundary = -1;
                 
                 std::string type = "";
                 std::string boundary = "";
@@ -63,6 +65,7 @@ void WebServer::run() {
                     data += buff;
                     if (parseType == 0) {
                         parseType = 1;
+                        
                         type = WebRequest::parseType(data);
                         if (type == "GET") {
                         
@@ -106,7 +109,7 @@ void WebServer::run() {
                         parseUri = 2;
                     }
                     
-                    if (parseUri == 2 && data.find("\r\n\r\n")) {
+                    if (parseUri == 2 && data.find("\r\n\r\n") != std::string::npos) {
                         request->parseHeader(data);
                         std::string contentType = request->getHeader("Content-Type");
                         if(type == "POST" && contentType.find("multipart") != -1) {
@@ -126,13 +129,21 @@ void WebServer::run() {
                             }
                             if(boundary.length() > 0) {
                                 hasBoundary = 1;
-                                //std::cout << "boundary: " << boundary << std::endl;
                             }
                         }
                         parseUri = 3;
                     }
+                    
+                    if (hasBoundary == 1) {
+                        std::cout << "boundary: " << boundary << std::endl;
+                        WebString ws = WebString(data);
+                        std::vector<std::string> segments = ws.explode(boundary);
+                        int segmentIndex;
+                        for (segmentIndex = 2; segmentIndex < segments.size(); segmentIndex++) {
+                            std::cout << "b-seg: " << segments[segmentIndex] << "::::end" << std::endl;
+                        }
+                    }
                 }
-                //std::cout << "START:" << data << ":END" << std::endl;
                 request->parseHeader(data);
 
                 // Create or Load Session
