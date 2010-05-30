@@ -43,7 +43,7 @@ void WebRequest::parseHttpHeader() {
     WebString ws = WebString(this->head);
     
     segments = ws.explode(delimiter);
-    for (int i=0; i < segments.size(); i++) {
+    for (unsigned int i = 0; i < segments.size(); i++) {
         ws = WebString(segments[i]);
         segments[i] = ws.trim();
         

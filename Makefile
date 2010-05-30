@@ -13,10 +13,10 @@ webserver/Socket.o: webserver/Socket.cpp webserver/Socket.h
 	g++ $(FLAGS) webserver/Socket.cpp -o webserver/Socket.o
 	
 webserver/SqlQuery.o: webserver/SqlQuery.cpp webserver/SqlQuery.h webserver/SqlRow.h
-	g++ $(FLAGS) webserver/SqlQuery.cpp -o webserver/SqlQuery.o
+	g++ $(FLAGS) -lsqlite3 webserver/SqlQuery.cpp -o webserver/SqlQuery.o
 	
 webserver/SqlRow.o: webserver/SqlRow.cpp webserver/SqlRow.h
-	g++ $(FLAGS) webserver/SqlRow.cpp -o webserver/SqlRow.o
+	g++ $(FLAGS) -lsqlite3 webserver/SqlRow.cpp -o webserver/SqlRow.o
 	
 webserver/WebBoundary.o: webserver/WebBoundary.cpp webserver/WebBoundary.h
 	g++ $(FLAGS) webserver/WebBoundary.cpp -o webserver/WebBoundary.o
@@ -40,7 +40,7 @@ WebString.o: webserver/WebString.cpp webserver/WebString.h
 	g++ $(FLAGS) webserver/WebString.cpp -o webserver/WebString.o
 
 libwebserver:  webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
-	g++ -shared -g -Wall -o libwebserver.so webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
+	#g++ -fPIC -g -Wall -o libwebserver.so webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
 	
 website/admin/blog/posts.o:
 	g++ $(FLAGS) -o website/admin/blog/posts.o website/admin/blog/posts.cpp

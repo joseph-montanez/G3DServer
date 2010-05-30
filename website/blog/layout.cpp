@@ -7,6 +7,7 @@
 
 #include "layout.h"
 #include "string"
+#include "string.h"
 using namespace std;
 
 namespace blog {
@@ -40,19 +41,19 @@ namespace blog {
             <ul>\
         ");
 
-        if (nav_item == "home") {
+        if (strcmp(nav_item, "home") == 0) {
             html.append("<li><a href=\"#\" class=\"active\">Home</a></li>");
         } else {
             html.append("<li><a href=\"#\">Home</a></li>");
         }
 
-        if (nav_item == "webserver") {
+        if (strcmp(nav_item, "webserver") == 0) {
             html.append("<li><a href=\"webserver\" class=\"active\">G3D::WebServer</a></li>");
         } else {
             html.append("<li><a href=\"webserver\">G3D::WebServer</a></li>");
         }
 
-        if (nav_item == "db") {
+        if (strcmp(nav_item, "db") == 0) {
             html.append("<li><a href=\"/admin\" class=\"active\">admin</a></li>");
         } else {
             html.append("<li><a href=\"/admin\">admin</a></li>");

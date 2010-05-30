@@ -7,6 +7,7 @@
 
 #include "layout.h"
 #include "string"
+#include "string.h"
 using namespace std;
 
 namespace admin {
@@ -43,25 +44,25 @@ namespace admin {
             <ul>\
         ");
 
-        if (nav_item == "dashboard") {
+        if (strcmp(nav_item, "dashboard") == 0) {
             html.append("<li><a href=\"/admin/dashboard\" class=\"active\">Dashboard</a></li>");
         } else {
             html.append("<li><a href=\"/admin/dashboard\">Dashboard</a></li>");
         }
 
-        if (nav_item == "blog-posts") {
+        if (strcmp(nav_item, "blog-posts") == 0) {
             html.append("<li><a href=\"/admin/blog-posts\" class=\"active\">Posts</a></li>");
         } else {
             html.append("<li><a href=\"/admin/blog-posts\">Posts</a></li>");
         }
 
-        if (nav_item == "blog-comments") {
+        if (strcmp(nav_item, "dashboard") == 0) {
             html.append("<li><a href=\"/admin/blog-comments\" class=\"active\">Comments</a></li>");
         } else {
             html.append("<li><a href=\"/admin/blog-comments\">Comments</a></li>");
         }
 
-        if (nav_item == "upload-example") {
+        if (strcmp(nav_item, "upload-example") == 0) {
             html.append("<li><a href=\"/admin/upload-example\" class=\"active\">Upload Example</a></li>");
         } else {
             html.append("<li><a href=\"/admin/upload-example\">Upload Example</a></li>");
