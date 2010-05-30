@@ -28,7 +28,7 @@ void WebServer::addController(std::string uri, WebController* controller) {
 
 void WebServer::run() {
     std::string data, buff;
-    int status, isLoaded, hasBoundary, startBoundary, endBoundary;
+    int status, isLoaded, hasBoundary, startBoundary, endBoundary, readingBoundary;
     unsigned int nth;
     size_t found;
 
@@ -54,14 +54,17 @@ void WebServer::run() {
                 hasBoundary = 0;
                 startBoundary = -1;
                 endBoundary = -1;
+                readingBoundary = 0;
                 
                 std::string type = "";
                 std::string boundary = "";
                 int parseType = 0;
                 int parseUri = 0;
+                // TODO: Opera sends packets weird! have to rely on content-length grr
                 while (status == MAXRECV) {
                     buff = "";
                     status = client >> buff;
+                    std::cout << "status-start: " << status << std::endl;
                     data += buff;
                     if (parseType == 0) {
                         parseType = 1;
@@ -80,6 +83,7 @@ void WebServer::run() {
                             break;
                         }
                     }
+                    std::cout << type << std::endl;
                     
                     if (data.find_last_of("\r\n\r\n") != std::string::npos && type == "GET") {
                         status = 0;
@@ -134,14 +138,14 @@ void WebServer::run() {
                         parseUri = 3;
                     }
                     
-                    if (hasBoundary == 1) {
-                        std::cout << "boundary: " << boundary << std::endl;
+                    if (hasBoundary == 1 && readingBoundary == 0) {
+                        std::cout << "boundary-test: " << boundary << std::endl;
                         WebString ws = WebString(data);
-                        std::vector<std::string> segments = ws.explode(boundary);
-                        int segmentIndex;
-                        for (segmentIndex = 2; segmentIndex < segments.size(); segmentIndex++) {
-                            std::cout << "b-seg: " << segments[segmentIndex] << "::::end" << std::endl;
-                        }
+                        std::vector<std::string> segments = ws.explode(boundary + "--");
+                        
+                        std::cout << "Boundry Count: " << segments.size() << std::endl;
+                        std::cout << "upload: " << data << std::endl; 
+                        std::cout << "status: " << status << std::endl; 
                     }
                 }
                 request->parseHeader(data);

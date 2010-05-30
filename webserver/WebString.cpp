@@ -184,7 +184,6 @@ std::string WebString::implode(std::string delimiter, std::vector<std::string> s
 
 std::string WebString::trim() {
     std::string result(this->data);
-    
     int i,j,start,end;
 
     //ltrim
