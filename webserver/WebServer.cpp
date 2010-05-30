@@ -66,7 +66,6 @@ void WebServer::run() {
                 while (status == MAXRECV) {
                     buff = "";
                     status = client >> buff;
-                    std::cout << "status-start: " << status << std::endl;
                     data += buff;
                     bytesRead += status;
                     if (parseType == 0) {
@@ -142,6 +141,7 @@ void WebServer::run() {
                     }
                     
                     if (hasBoundary == 1 && readingBoundary == 0) {
+                        /*
                         std::cout << "boundary-test: " << boundary << std::endl;
                         WebString ws = WebString(data);
                         std::vector<std::string> segments = ws.explode(boundary + "--");
@@ -149,6 +149,7 @@ void WebServer::run() {
                         std::cout << "Boundry Count: " << segments.size() << std::endl;
                         //std::cout << "upload: " << data << std::endl; 
                         std::cout << "read " << (bytesRead - headerLength) << " of " << request->getHeader("Content-Length") << std::endl; 
+                        */
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
                         if (bytesRead - headerLength < totalBytes) {
                             status = MAXRECV;
@@ -157,10 +158,25 @@ void WebServer::run() {
                         continue;
                     }
                     
-                    if(hasBoundary == 2) {
-                    
+                }
+                //std::cout << data << std::endl;
+                if(hasBoundary == 2) {
+                    std::cout << data << std::endl;
+                    WebString ws = WebString(data);
+                    std::vector<std::string> segments = ws.explode("--" + boundary);
+                    int boundaryIndex;
+                    for (boundaryIndex = 1; boundaryIndex < segments.size(); boundaryIndex++) {
+                        std::string segment = segments[boundaryIndex];
+                        //std::cout << "Boundary: " << segment << std::endl; 
+                        ws = WebString(segment);
+                        std::vector<std::string> parts = ws.explode("\r\n\r\n");
+                        std::string boundaryHeader = parts[0];
+                        parts.erase(parts.begin());
+                        segment = ws.implode("\r\n\r\n", parts);
+                        std::cout << boundaryHeader << std::endl;
                     }
                 }
+                
                 request->parseHeader(data);
 
                 // Create or Load Session
