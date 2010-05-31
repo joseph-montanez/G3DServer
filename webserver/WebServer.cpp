@@ -10,6 +10,7 @@
 #include "WebSession.h"
 #include "WebServer.h"
 #include "WebString.h"
+#include "WebBoundary.h"
 #include <ctime>
 #include <cstdlib>
 
@@ -141,15 +142,6 @@ void WebServer::run() {
                     }
                     
                     if (hasBoundary == 1 && readingBoundary == 0) {
-                        /*
-                        std::cout << "boundary-test: " << boundary << std::endl;
-                        WebString ws = WebString(data);
-                        std::vector<std::string> segments = ws.explode(boundary + "--");
-                        
-                        std::cout << "Boundry Count: " << segments.size() << std::endl;
-                        //std::cout << "upload: " << data << std::endl; 
-                        std::cout << "read " << (bytesRead - headerLength) << " of " << request->getHeader("Content-Length") << std::endl; 
-                        */
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
                         if (bytesRead - headerLength < totalBytes) {
                             status = MAXRECV;
@@ -160,10 +152,12 @@ void WebServer::run() {
                     
                 }
                 //std::cout << data << std::endl;
+                
+                // Parse Uploaded Files
                 if(hasBoundary == 2) {
-                    std::cout << data << std::endl;
+                    //std::cout << data << std::endl;
                     WebString ws = WebString(data);
-                    std::vector<std::string> segments = ws.explode("--" + boundary);
+                    std::vector<std::string> segments = ws.explode("--" + boundary + "\r\n");
                     int boundaryIndex;
                     for (boundaryIndex = 1; boundaryIndex < segments.size(); boundaryIndex++) {
                         std::string segment = segments[boundaryIndex];
@@ -173,7 +167,41 @@ void WebServer::run() {
                         std::string boundaryHeader = parts[0];
                         parts.erase(parts.begin());
                         segment = ws.implode("\r\n\r\n", parts);
-                        std::cout << boundaryHeader << std::endl;
+                        //std::cout << "START:" << boundaryHeader << ":END" << std::endl;
+                        
+                        // Parse Boundary Header
+                        std::map<std::string, std::string> bHead;
+                        bHead = ws.parseHttpHeader(boundaryHeader);
+                        WebBoundary file = WebBoundary();
+                        file.params = bHead;
+                        file.formData = segment;
+                        
+                        std::cout << "File-type: " << file.getParameter("Content-Disposition") << std::endl;
+                        // Parse Disposition into fieldname and filename, 
+                        ws = WebString(file.getParameter("Content-Disposition"));
+                        std::map<std::string, std::string> params;
+                        params = ws.parseParams(std::string("="), std::string(";"));
+                        
+                        // Iterate through params and remove quotes
+                        std::map<std::string, std::string>::iterator iter;
+                        for(iter = params.begin(); iter != params.end(); iter++) {
+                            std::string value = iter->second;
+                            if(value.substr(0, 1) == "\"") {
+                                value = value.substr(1);
+                            }
+                            if(value.substr(value.length() - 1, 1) == "\"") {
+                                value = value.substr(0, value.length() - 1);
+                            }
+                            std::cout << "key: " << iter->first << std::endl;
+                            std::cout << "value: " << value << std::endl;
+                            if (value != iter->second) {
+                                params[iter->first] = value;    
+                            }
+                        }
+                        
+                        file.filename = params["filename"];
+                        file.name = params["name"];
+                        
                     }
                 }
                 

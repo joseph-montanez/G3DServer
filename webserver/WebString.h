@@ -34,6 +34,9 @@ public:
     static std::string fromInt(int number);
     std::string trim();
     std::map<std::string, std::string> parseParams();
+    std::map<std::string, std::string> parseParams(std::string delimiter1, std::string delimiter2);
+    std::map<std::string, std::string> parseHttpHeader(std::string data);
+    std::vector<std::string> parseHttpSegment(std::string data);
 
     std::string data;
 };

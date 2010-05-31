@@ -12,8 +12,13 @@ public:
     ~WebBoundary();
     std::string getPath();
     std::string getParameter(std::string key);
+    std::string getData();
     std::string path;
     std::map<std::string, std::string> params;
+    std::string formData;
+    std::string contentType;
+    std::string name;
+    std::string filename;
 };
 
 #endif

@@ -42,7 +42,7 @@ std::string WebString::uppercase() {
     return value;
 }
 
-std::map<std::string, std::string> WebString::parseParams() {
+std::map<std::string, std::string> WebString::parseParams(std::string delimiter1, std::string delimiter2) {
     std::string uri, q, k, v, buffer;
     q = this->data;
     std::map<std::string, std::string> params;
@@ -55,8 +55,8 @@ std::map<std::string, std::string> WebString::parseParams() {
             break;
         }
         
-        stub_begin  = q.find("=");
-        stub_end    = q.find("&");
+        stub_begin  = q.find(delimiter1);
+        stub_end    = q.find(delimiter2);
 
         if (stub_end == -1) {
             stub_end = stub_length;
@@ -72,6 +72,11 @@ std::map<std::string, std::string> WebString::parseParams() {
             } else {
                 k = q;
             }
+            
+            // TODO: this should not be forced, optional trim should be as a parameter.
+            if(k.substr(0, 1) == " ") {
+                k = k.substr(1);
+            }
             params[k] = v;
         }
         if (stub_end != stub_length) {
@@ -82,6 +87,10 @@ std::map<std::string, std::string> WebString::parseParams() {
     }
     
     return params;
+}
+
+std::map<std::string, std::string> WebString::parseParams() {
+    return this->parseParams(std::string("="), std::string("&"));
 }
 
 std::string WebString::urlDecode() {
@@ -122,6 +131,58 @@ std::string WebString::fromInt(int i) {
     out << i;
     s = out.str();
     return s;
+}
+
+std::vector<std::string> WebString::parseHttpSegment(std::string data) {
+    WebString ws = WebString(data);
+    std::vector<std::string> segments = ws.explode(":");
+    std::string key = "";
+    std::string value = "";
+    if(segments.size() > 1)
+    {
+        key = segments[0];
+        segments.erase(segments.begin());
+    }
+    
+    if(segments.size() > 0)
+    {
+        ws = WebString("");
+        value = ws.implode(":", segments);
+    }
+    
+    std::vector<std::string> string_array;
+    string_array.push_back(key);
+    string_array.push_back(value);
+    return string_array;
+}
+
+std::map<std::string, std::string> WebString::parseHttpHeader(std::string data) {
+    std::map<std::string, std::string> header;
+    std::vector<std::string> segments;
+    std::vector<std::string> string_array;
+    std::string delimiter = "\r\n";
+    WebString ws = WebString(data);
+    
+    segments = ws.explode(delimiter);
+    for (int i=0; i < segments.size(); i++) {
+        ws = WebString(segments[i]);
+        segments[i] = ws.trim();
+        
+        if (segments[i].empty()) {
+            break;
+        }
+        WebString wstr = WebString("");
+        string_array = this->parseHttpSegment(segments[i]);
+        
+        wstr.data = string_array[0];
+        std::string key = wstr.trim();
+        wstr.data = string_array[1];
+        std::string value = wstr.trim();
+        
+        header[key] = value;
+    }
+    
+    return header;
 }
 
 std::string WebString::wordwrap(int width) {
