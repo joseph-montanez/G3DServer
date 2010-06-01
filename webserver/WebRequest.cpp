@@ -220,7 +220,7 @@ std::string WebRequest::parseHeader(std::string data) {
     }
 
     // Iterate through each parameter and url decode them
-    ParamMap::iterator iter;
+    std::map<std::string, std::string>::iterator iter;
     for(iter = this->params.begin(); iter != this->params.end(); iter++) {
         WebString ws = WebString(iter->second);
         this->params[iter->first] = ws.urlDecode();
@@ -230,7 +230,7 @@ std::string WebRequest::parseHeader(std::string data) {
 }
 
 std::string WebRequest::get(std::string key) {
-    ParamMap::iterator iter;
+    std::map<std::string, std::string>::iterator iter;
     std::string value;
     iter = this->params.find(key);
     if (iter != this->params.end()) {
@@ -241,8 +241,30 @@ std::string WebRequest::get(std::string key) {
     return value;
 }
 
+WebBoundary WebRequest::getFile(std::string name) {
+    std::map<std::string, WebBoundary>::iterator iter;
+    WebBoundary file;
+    iter = this->files.find(name);
+    if (iter != this->files.end()) {
+        file = iter->second;
+    } else {
+        file = WebBoundary();
+    }
+    return file;
+}
+
+bool WebRequest::hasFile(std::string name) {
+    std::map<std::string, WebBoundary>::iterator iter;
+    iter = this->files.find(name);
+    if (iter != this->files.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 std::string WebRequest::getCookie(std::string key) {
-    ParamMap::iterator iter;
+    std::map<std::string, std::string>::iterator iter;
     std::string value;
     value = "";
     if(this->cookies.size() != 0) {
@@ -257,7 +279,7 @@ std::string WebRequest::getCookie(std::string key) {
 }
 
 std::string WebRequest::getHeader(std::string key) {
-    ParamMap::iterator iter;
+    std::map<std::string, std::string>::iterator iter;
     std::string value;
     value = "";
     if(this->header.size() != 0) {

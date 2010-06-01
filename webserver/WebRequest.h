@@ -5,8 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
-
-typedef std::map<std::string, std::string> ParamMap;
+#include "WebBoundary.h"
 
 class WebRequest {
 public:
@@ -24,9 +23,12 @@ public:
     std::string head;
     std::string uri;
     std::string type;
-    ParamMap header;
-    ParamMap params;
-    ParamMap cookies;
+    std::map<std::string, std::string> header;
+    std::map<std::string, std::string> params;
+    std::map<std::string, std::string> cookies;
+    std::map<std::string, WebBoundary> files;
+    WebBoundary getFile(std::string name);
+    bool hasFile(std::string name);
 };
 
 #endif

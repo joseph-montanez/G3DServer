@@ -175,8 +175,8 @@ void WebServer::run() {
                         WebBoundary file = WebBoundary();
                         file.params = bHead;
                         file.formData = segment;
+                        file.contentType = file.getParameter("Content-Type");
                         
-                        std::cout << "File-type: " << file.getParameter("Content-Disposition") << std::endl;
                         // Parse Disposition into fieldname and filename, 
                         ws = WebString(file.getParameter("Content-Disposition"));
                         std::map<std::string, std::string> params;
@@ -192,8 +192,6 @@ void WebServer::run() {
                             if(value.substr(value.length() - 1, 1) == "\"") {
                                 value = value.substr(0, value.length() - 1);
                             }
-                            std::cout << "key: " << iter->first << std::endl;
-                            std::cout << "value: " << value << std::endl;
                             if (value != iter->second) {
                                 params[iter->first] = value;    
                             }
@@ -201,7 +199,9 @@ void WebServer::run() {
                         
                         file.filename = params["filename"];
                         file.name = params["name"];
-                        
+                        if (!file.filename.empty()) {
+                            request->files[file.name] = file;
+                        }
                     }
                 }
                 

@@ -32,7 +32,7 @@ class WebSession {
         void load();
         std::string id;
         int loaded;
-        ParamMap params;
+        std::map<std::string, std::string> params;
         WebResponse* response;
         WebRequest* request;
 };

@@ -48,7 +48,7 @@ std::string WebSession::get(const char* key) {
 }
 
 std::string WebSession::get(std::string key) {
-    ParamMap::iterator iter;
+    std::map<std::string, std::string>::iterator iter;
     std::string value;
     iter = this->params.find(key);
     if (iter != this->params.end()) {
@@ -65,7 +65,7 @@ void WebSession::unset(const char* key) {
 }
 
 void WebSession::unset(std::string key) {
-    ParamMap::iterator iter;
+    std::map<std::string, std::string>::iterator iter;
     std::string value;
     iter = this->params.find(key);
     if (iter != this->params.end()) {

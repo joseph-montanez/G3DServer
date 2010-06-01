@@ -42,13 +42,13 @@ WebString.o: webserver/WebString.cpp webserver/WebString.h
 libwebserver:  webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
 	#g++ -fPIC -g -Wall -o libwebserver.so webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
 	
-website/admin/blog/posts.o:
+website/admin/blog/posts.o: website/admin/blog/posts.cpp
 	g++ $(FLAGS) -o website/admin/blog/posts.o website/admin/blog/posts.cpp
 
-website/admin/blog/comments.o:
+website/admin/blog/comments.o: website/admin/blog/comments.cpp
 	g++ $(FLAGS) -o website/admin/blog/comments.o website/admin/blog/comments.cpp
 
-website/admin/upload/form.o:
+website/admin/upload/form.o: website/admin/upload/form.cpp
 	g++ $(FLAGS) -o website/admin/upload/form.o website/admin/upload/form.cpp
 
 website/admin/index.o:
