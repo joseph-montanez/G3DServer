@@ -168,19 +168,32 @@ std::string WebRequest::parseHeader(std::string data) {
 		ws = WebString(data);
 		std::vector<std::string> parts = ws.explode("\r\n");
 		paramData = parts[0];
+		if (paramData.find("?") != std::string::npos) {
+			ws = WebString(paramData);
+			std::vector<std::string> parts = ws.explode("?");
+			paramData = paramData.substr(paramData.find("?"));
+			
+			if (paramData.find(" ")) {
+				paramData = paramData.substr(paramData.find(" "));
+			}
+		} else {
+			paramData = "";
+		}
 	}
 
+	std::cout << "param-data:" << paramData << ":end" << std::endl << "----------------------" << std::endl;
+ 
 	if (!paramData.empty()) {
 		ws = WebString(paramData);
 		this->params = ws.parseParams();
-	}
 
-    // Iterate through each parameter and url decode them
-    std::map<std::string, std::string>::iterator iter;
-    for(iter = this->params.begin(); iter != this->params.end(); iter++) {
-        WebString ws = WebString(iter->second);
-        this->params[iter->first] = ws.urlDecode();
-    }
+		// Iterate through each parameter and url decode them
+		std::map<std::string, std::string>::iterator iter;
+		for(iter = this->params.begin(); iter != this->params.end(); iter++) {
+			WebString ws = WebString(iter->second);
+			this->params[iter->first] = ws.urlDecode();
+		}
+	}
 
     return this->parseUri(data);
 }

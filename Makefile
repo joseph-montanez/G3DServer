@@ -55,25 +55,25 @@ website/admin/upload/form.o: website/admin/upload/form.cpp
 website/admin/index.o:
 	g++ $(FLAGS) -o website/admin/index.o website/admin/index.cpp
 
-website/admin/dashboard.o: 
+website/admin/dashboard.o: website/admin/dashboard.cpp
 	g++ $(FLAGS) -o website/admin/dashboard.o website/admin/dashboard.cpp
 
-website/admin/layout.o:
+website/admin/layout.o: website/admin/layout.cpp
 	g++ $(FLAGS) -o website/admin/layout.o website/admin/layout.cpp
 
-website/admin/login.o:
+website/admin/login.o: website/admin/login.cpp
 	g++ $(FLAGS) -o website/admin/login.o website/admin/login.cpp
 	
-website/admin/logout.o:
+website/admin/logout.o: website/admin/logout.cpp
 	g++ $(FLAGS) -o website/admin/logout.o website/admin/logout.cpp 
 
-website/blog/layout.o:
+website/blog/layout.o: website/blog/layout.cpp
 	g++ $(FLAGS) -o website/blog/layout.o website/blog/layout.cpp
 	
-website/main.o:
+website/main.o: website/main.cpp
 	g++ $(FLAGS) -o website/main.o website/main.cpp
 	
-website/index.o:
+website/index.o: website/index.cpp
 	g++ $(FLAGS) -o website/index.o website/index.cpp
 
 webware: libwebserver website/index.o website/main.o website/blog/layout.o website/admin/logout.o website/admin/login.o website/admin/dashboard.o website/admin/index.o website/admin/upload/form.o website/admin/blog/posts.o website/admin/blog/comments.o website/admin/layout.o 

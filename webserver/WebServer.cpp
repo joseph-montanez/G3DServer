@@ -73,6 +73,7 @@ void WebServer::run() {
                         parseType = 1;
                         
                         type = WebRequest::parseType(data);
+						request->type = type;
                         if (type == "GET") {
                         
                         } else if (type == "POST") {
@@ -82,7 +83,7 @@ void WebServer::run() {
                             controller->response = response;
                             controller->request = request;
                             controller->response->setStatus(404);
-                            controller->response->body.append("<h1>Page Not Found</h1>404");
+                            controller->response->body.append("<h1>Page Not Found - not a get or post</h1>404");
                             break;
                         }
                     } 
@@ -107,7 +108,7 @@ void WebServer::run() {
                             controller->response = response;
                             controller->request = request;
                             controller->response->setStatus(404);
-                            controller->response->body.append("<h1>Page Not Found</h1>404");
+                            controller->response->body.append("<h1>Page Not Found - no controller found!</h1>404");
                             //std::cout << "404 START:" << data << ":END 404" << std::endl;
                             break;
                         }
@@ -232,9 +233,10 @@ void WebServer::run() {
                     
                 }
                 
-                //std::cout << controller->response->toString() << std::endl;
+				std::string out = controller->response->toString();
+                std::cout << out << std::endl;
                 //std::cout << "writting ..." << std::endl;
-                client << controller->response->toString();
+                client << out;
                 
                 delete request;
                 delete response;
