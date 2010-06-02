@@ -86,7 +86,6 @@ void WebServer::run() {
                             break;
                         }
                     } 
-                    
                     if (data.find_last_of("\r\n\r\n") != std::string::npos && type == "GET") {
                         status = 0;
                     }
@@ -141,6 +140,14 @@ void WebServer::run() {
                         parseUri = 3;
                     }
                     
+                    if (type == "POST" && !request->getHeader("Content-Length").empty()) {
+                        int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
+                        if (bytesRead - headerLength < totalBytes) {
+                            status = MAXRECV;
+                        }
+                    }
+					// blah
+					/*
                     if (hasBoundary == 1 && readingBoundary == 0) {
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
                         if (bytesRead - headerLength < totalBytes) {
@@ -149,9 +156,10 @@ void WebServer::run() {
                         hasBoundary = 2;
                         continue;
                     }
+					*/
                     
                 }
-                //std::cout << data << std::endl;
+                std::cout << data << "\n----------" << std::endl;
                 
                 // Parse Uploaded Files
                 if(hasBoundary == 2) {
