@@ -3,7 +3,8 @@ FLAGS = -c -g -Wall
 all: webware
 
 clean:
-	find . -type f -name "*.o" -exec rm -f {} \;
+	find . -type f -name "*.o" -exec rm -f {} \;	
+	find . -type f -name "*.swp" -exec rm -f {} \;
 	rm -f libwebserver.so webware
 
 webserver/ServerSocket.o: webserver/ServerSocket.cpp webserver/ServerSocket.h webserver/SocketException.h webserver/Socket.h
