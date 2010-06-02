@@ -87,7 +87,8 @@ void WebServer::run() {
                             break;
                         }
                     } 
-                    if (data.find_last_of("\r\n\r\n") != std::string::npos && type == "GET") {
+                    std::cout << "possible: " << std::string::npos << std::endl;
+                    if (data.find("\r\n\r\n") > -1 && type == "GET") {
                         status = 0;
                     }
                     
@@ -160,7 +161,7 @@ void WebServer::run() {
 					*/
                     
                 }
-                std::cout << data << "\n----------" << std::endl;
+                //std::cout << data << "\n----------" << std::endl;
                 
                 // Parse Uploaded Files
                 if(hasBoundary == 2) {
@@ -213,6 +214,9 @@ void WebServer::run() {
                         }
                     }
                 }
+                std::cout << "---------------- DATA IN START ----------------" << std::endl;
+                std::cout << data << std::endl;
+                std::cout << "---------------- DATA IN END ----------------" << std::endl;
                 
                 request->parseHeader(data);
 
@@ -222,6 +226,7 @@ void WebServer::run() {
                 if (this->sessions.find(session.id) != this->sessions.end()) {
                     session = this->sessions[session.id];
                 }
+                
 
                 //std::cout << session.id << std::endl;
                 if (iter != this->controllers->end()) {
@@ -233,9 +238,13 @@ void WebServer::run() {
                     
                 }
                 
+	            std::cout << "\nsession id:" << session.id << std::endl;
+	            std::cout << "\nadmin id:" << session.get("admin_id") << std::endl;
+                
 				std::string out = controller->response->toString();
+                std::cout << "---------------- DATA OUT START ----------------" << std::endl;
                 std::cout << out << std::endl;
-                //std::cout << "writting ..." << std::endl;
+                std::cout << "---------------- DATA OUT END ----------------" << std::endl;
                 client << out;
                 
                 delete request;

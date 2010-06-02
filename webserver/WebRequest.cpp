@@ -35,7 +35,6 @@ std::vector<std::string> WebRequest::parseHttpSegment(std::string data) {
 }
 
 void WebRequest::parseHttpHeader() {
-    // This is a revamp of parseHeader() to allow file uploads (because its dirty!)
     std::string uri, q, k, v, buffer, data;
     std::vector<std::string> segments;
     std::vector<std::string> string_array;
@@ -181,7 +180,11 @@ std::string WebRequest::parseHeader(std::string data) {
 		}
 	}
 
-	std::cout << "param-data:" << paramData << ":end" << std::endl << "----------------------" << std::endl;
+    ws = WebString(data);
+	std::vector<std::string> parts = ws.explode("\r\n");
+	
+	std::cout << parts[0] << "\n" << "param-data:" << paramData << ":end" 
+	    << std::endl << "----------------------" << std::endl;
  
 	if (!paramData.empty()) {
 		ws = WebString(paramData);

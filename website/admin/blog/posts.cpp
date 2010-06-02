@@ -21,13 +21,10 @@ namespace admin {
                 string admin_id = this->session->get("admin_id");
                 bool logged_in = false;
 
-                if (admin_id.length() > 0) {
-                    logged_in = true;
-                }
-
-                if (!logged_in) {
+                if (admin_id.empty()) {
                     this->response->setStatus(301);
                     this->response->setHeader("location", "Location: /admin");
+                    return;
                 }
 
                 this->append(admin::layout::header("Blog Posts | Admin | Gorilla Labs", "blog-posts", logged_in));

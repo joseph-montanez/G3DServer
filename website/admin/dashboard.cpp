@@ -21,6 +21,7 @@ namespace admin {
             if (!logged_in) {
                 this->response->setStatus(302);
                 this->response->setHeader("location", "Location: /admin");
+                return;
             }
 
             this->response->body.append(admin::layout::header("Blog Posts | Admin | Gorilla Labs", "dashboard", logged_in));
