@@ -86,8 +86,10 @@ void WebServer::run() {
                             controller->response->body.append("<h1>Page Not Found - not a get or post</h1>404");
                             break;
                         }
+                        
+                        //std::cout << "type: " << type << std::endl;
                     } 
-                    std::cout << "possible: " << std::string::npos << std::endl;
+                    //std::cout << "possible: " << std::string::npos << std::endl;
                     if (data.find("\r\n\r\n") > -1 && type == "GET") {
                         status = 0;
                     }
@@ -97,6 +99,7 @@ void WebServer::run() {
                         if (data.find("\r\n") != std::string::npos) {
                             uri = WebRequest::parseUri(data);
                             parseUri = 1;
+                            //std::cout << "uri: " << uri << std::endl;
                         }
                     }
                     
@@ -120,6 +123,7 @@ void WebServer::run() {
                         headerLength = data.find("\r\n\r\n") - 4;
                         request->parseHeader(data);
                         std::string contentType = request->getHeader("Content-Type");
+                        
                         if(type == "POST" && contentType.find("multipart") != -1) {
                             WebString ws = WebString(contentType);
                             std::vector<std::string> segments = ws.explode(";");
@@ -148,17 +152,12 @@ void WebServer::run() {
                             status = MAXRECV;
                         }
                     }
+                    
 					// blah
-					/*
                     if (hasBoundary == 1 && readingBoundary == 0) {
-                        int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
-                        if (bytesRead - headerLength < totalBytes) {
-                            status = MAXRECV;
-                        }
                         hasBoundary = 2;
-                        continue;
                     }
-					*/
+					
                     
                 }
                 //std::cout << data << "\n----------" << std::endl;
@@ -214,9 +213,9 @@ void WebServer::run() {
                         }
                     }
                 }
-                std::cout << "---------------- DATA IN START ----------------" << std::endl;
-                std::cout << data << std::endl;
-                std::cout << "---------------- DATA IN END ----------------" << std::endl;
+                //std::cout << "---------------- DATA IN START ----------------" << std::endl;
+                //std::cout << data << std::endl;
+                //std::cout << "---------------- DATA IN END ----------------" << std::endl;
                 
                 request->parseHeader(data);
 
@@ -238,13 +237,13 @@ void WebServer::run() {
                     
                 }
                 
-	            std::cout << "\nsession id:" << session.id << std::endl;
-	            std::cout << "\nadmin id:" << session.get("admin_id") << std::endl;
+	            //std::cout << "\nsession id:" << session.id << std::endl;
+	            //std::cout << "\nadmin id:" << session.get("admin_id") << std::endl;
                 
 				std::string out = controller->response->toString();
-                std::cout << "---------------- DATA OUT START ----------------" << std::endl;
-                std::cout << out << std::endl;
-                std::cout << "---------------- DATA OUT END ----------------" << std::endl;
+                //std::cout << "---------------- DATA OUT START ----------------" << std::endl;
+                //std::cout << out << std::endl;
+                //std::cout << "---------------- DATA OUT END ----------------" << std::endl;
                 client << out;
                 
                 delete request;

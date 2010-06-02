@@ -180,11 +180,11 @@ std::string WebRequest::parseHeader(std::string data) {
 		}
 	}
 
-    ws = WebString(data);
-	std::vector<std::string> parts = ws.explode("\r\n");
+    //ws = WebString(data);
+	//std::vector<std::string> parts = ws.explode("\r\n");
 	
-	std::cout << parts[0] << "\n" << "param-data:" << paramData << ":end" 
-	    << std::endl << "----------------------" << std::endl;
+	//std::cout << parts[0] << "\n" << "param-data:" << paramData << ":end" 
+	//    << std::endl << "----------------------" << std::endl;
  
 	if (!paramData.empty()) {
 		ws = WebString(paramData);
