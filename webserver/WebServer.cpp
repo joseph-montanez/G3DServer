@@ -73,6 +73,7 @@ void WebServer::run() {
                         parseType = 1;
                         
                         type = WebRequest::parseType(data);
+						request->type = type;
                         if (type == "GET") {
                         
                         } else if (type == "POST") {
@@ -82,11 +83,10 @@ void WebServer::run() {
                             controller->response = response;
                             controller->request = request;
                             controller->response->setStatus(404);
-                            controller->response->body.append("<h1>Page Not Found</h1>404");
+                            controller->response->body.append("<h1>Page Not Found - not a get or post</h1>404");
                             break;
                         }
                     } 
-                    
                     if (data.find_last_of("\r\n\r\n") != std::string::npos && type == "GET") {
                         status = 0;
                     }
@@ -108,7 +108,7 @@ void WebServer::run() {
                             controller->response = response;
                             controller->request = request;
                             controller->response->setStatus(404);
-                            controller->response->body.append("<h1>Page Not Found</h1>404");
+                            controller->response->body.append("<h1>Page Not Found - no controller found!</h1>404");
                             //std::cout << "404 START:" << data << ":END 404" << std::endl;
                             break;
                         }
@@ -141,6 +141,14 @@ void WebServer::run() {
                         parseUri = 3;
                     }
                     
+                    if (type == "POST" && !request->getHeader("Content-Length").empty()) {
+                        int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
+                        if (bytesRead - headerLength < totalBytes) {
+                            status = MAXRECV;
+                        }
+                    }
+					// blah
+					/*
                     if (hasBoundary == 1 && readingBoundary == 0) {
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
                         if (bytesRead - headerLength < totalBytes) {
@@ -149,9 +157,10 @@ void WebServer::run() {
                         hasBoundary = 2;
                         continue;
                     }
+					*/
                     
                 }
-                //std::cout << data << std::endl;
+                std::cout << data << "\n----------" << std::endl;
                 
                 // Parse Uploaded Files
                 if(hasBoundary == 2) {
@@ -224,9 +233,10 @@ void WebServer::run() {
                     
                 }
                 
-                //std::cout << controller->response->toString() << std::endl;
+				std::string out = controller->response->toString();
+                std::cout << out << std::endl;
                 //std::cout << "writting ..." << std::endl;
-                client << controller->response->toString();
+                client << out;
                 
                 delete request;
                 delete response;

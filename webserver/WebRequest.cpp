@@ -147,86 +147,55 @@ std::string WebRequest::parseType(std::string data) {
 }
 
 std::string WebRequest::parseHeader(std::string data) {
-    std::string uri, q, k, v, buffer;
-    int stub_length, stub_begin, stub_end;
     this->head = data;
-    /* Find the GET line */
-    stub_length = this->head.length();
-    if (stub_length == 0) {
-        return uri;
-    }
+
     this->parseCookies();
     this->parseHttpHeader();
-    //std::cout << this->head;
-    stub_begin = this->head.find("GET");
-    this->type = "GET";
-    if (stub_begin == -1) {
-        /* This is a Post? */
-        stub_begin = this->head.find("POST");
-        this->type = "POST";
-    }
-    if (stub_begin == -1) {
-        return uri;
-    }
-    //std::cout << this->type << std::endl;
-    stub_end = this->head.substr(stub_begin, stub_length).find("\n");
-    if (stub_begin > -1 && stub_end > -1) {
-        uri = this->head.substr(stub_begin, stub_end);
-    }
 
-    /* Find the request within the GET line */
-    stub_length = uri.length();
-    if (stub_length == 0) {
-        return uri;
-    }
-    stub_begin = uri.find("/");
-    stub_end   = -1;
-    if(stub_begin != -1) {
-        stub_end = uri.substr(stub_begin, stub_length).find(" ");
-    }
-    if (stub_begin > -1 && stub_end > -1) {
-        uri = uri.substr(stub_begin, stub_end);
-    }
+	//-- Parse parameters
+	std::string type = this->parseType(data);
+	std::string contentType = this->getHeader("Content-Type");
 
-    //std::cout <<  "URI: " + uri + "\n" << std::endl;
+	std::string paramData;
+	WebString ws = WebString("");
 
-    /* Find the query within the ? line */
-    stub_length = uri.length();
-    if (stub_length == 0 && this->type == "GET") {
-        return uri;
-    }
-    stub_begin = uri.find("?");
-    if (this->type == "POST") {
-        stub_begin = this->head.find("\r\n\r\n");
-        //printf("begin: %i\n", stub_begin);
-    }
+	if (type == "POST" && contentType == "application/x-www-form-urlencoded") {
+		ws = WebString(data);
+		std::vector<std::string> parts = ws.explode("\r\n\r\n");
+		parts.erase(parts.begin());
+		paramData = ws.implode("\r\n\r\n", parts);
+	} else if (type == "GET") {
+		ws = WebString(data);
+		std::vector<std::string> parts = ws.explode("\r\n");
+		paramData = parts[0];
+		if (paramData.find("?") != std::string::npos) {
+			ws = WebString(paramData);
+			std::vector<std::string> parts = ws.explode("?");
+			paramData = paramData.substr(paramData.find("?"));
+			
+			if (paramData.find(" ")) {
+				paramData = paramData.substr(paramData.find(" "));
+			}
+		} else {
+			paramData = "";
+		}
+	}
 
-    if (stub_begin == -1) {
-        //std::cout << "NO QUERY\n" << std::endl;
-        return uri;
-    }
+	std::cout << "param-data:" << paramData << ":end" << std::endl << "----------------------" << std::endl;
+ 
+	if (!paramData.empty()) {
+		ws = WebString(paramData);
+		this->params = ws.parseParams();
 
-    if (this->type == "GET") {
-        q = uri.substr(stub_begin + 1, stub_length);
-        uri = uri.substr(0, stub_begin);
-    } else if (this->type == "POST") {
-        stub_length = this->head.length();
-        q = this->head.substr(stub_begin + 4, stub_length);
-    }
+		// Iterate through each parameter and url decode them
+		std::map<std::string, std::string>::iterator iter;
+		for(iter = this->params.begin(); iter != this->params.end(); iter++) {
+			WebString ws = WebString(iter->second);
+			this->params[iter->first] = ws.urlDecode();
+		}
+	}
 
-    if(q.length() > 0) {
-        WebString ws = WebString(q);
-        this->params = ws.parseParams();
-    }
-
-    // Iterate through each parameter and url decode them
-    std::map<std::string, std::string>::iterator iter;
-    for(iter = this->params.begin(); iter != this->params.end(); iter++) {
-        WebString ws = WebString(iter->second);
-        this->params[iter->first] = ws.urlDecode();
-    }
-
-    return uri;
+    return this->parseUri(data);
 }
 
 std::string WebRequest::get(std::string key) {
