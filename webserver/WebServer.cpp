@@ -36,6 +36,7 @@ void WebServer::run() {
 
     srand(time(0));
     std::cout << "running....\n";
+    //http://stackoverflow.com/questions/441203/proper-way-to-store-binary-data-with-c-stl
 
     try {
         // Create the socket
@@ -67,7 +68,7 @@ void WebServer::run() {
                 while (status == MAXRECV) {
                     buff = "";
                     status = client >> buff;
-                    data += buff;
+                    data.append(buff);
                     bytesRead += status;
                     if (parseType == 0) {
                         parseType = 1;
@@ -148,6 +149,7 @@ void WebServer::run() {
                     
                     if (type == "POST" && !request->getHeader("Content-Length").empty()) {
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
+                        std::cout << bytesRead - headerLength << " of " << totalBytes << std::endl;
                         if (bytesRead - headerLength < totalBytes) {
                             status = MAXRECV;
                         }
@@ -176,7 +178,8 @@ void WebServer::run() {
                         std::string boundaryHeader = parts[0];
                         parts.erase(parts.begin());
                         segment = ws.implode("\r\n\r\n", parts);
-                        //std::cout << "START:" << boundaryHeader << ":END" << std::endl;
+                        
+                        std::cout << "bytes" << segment.length() << ":END" << std::endl;
                         
                         // Parse Boundary Header
                         std::map<std::string, std::string> bHead;
@@ -213,9 +216,9 @@ void WebServer::run() {
                         }
                     }
                 }
-                //std::cout << "---------------- DATA IN START ----------------" << std::endl;
-                //std::cout << data << std::endl;
-                //std::cout << "---------------- DATA IN END ----------------" << std::endl;
+                std::cout << "---------------- DATA IN START ----------------" << std::endl;
+                std::cout << data << std::endl;
+                std::cout << "---------------- DATA IN END ----------------" << std::endl;
                 
                 request->parseHeader(data);
 
