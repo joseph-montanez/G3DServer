@@ -30,7 +30,7 @@ namespace admin {
                     // for binary / pure text writes 
                     file.open(boundary.filename.c_str(), ios::out | ios::binary);
                     if (file.is_open()) {
-                        file.write(data.c_str(), data.length());
+                        file.write(data.data(), data.length());
                     } else {
                         content.append("<p>Cannot Open File!</p>");
                     }

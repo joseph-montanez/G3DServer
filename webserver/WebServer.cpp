@@ -13,6 +13,7 @@
 #include "WebBoundary.h"
 #include <ctime>
 #include <cstdlib>
+#include <bitset>
 
 WebServer::WebServer() {
     this->controllers = new ControllerMap;
@@ -36,7 +37,6 @@ void WebServer::run() {
 
     srand(time(0));
     std::cout << "running....\n";
-    //http://stackoverflow.com/questions/441203/proper-way-to-store-binary-data-with-c-stl
 
     try {
         // Create the socket
@@ -46,6 +46,8 @@ void WebServer::run() {
             ServerSocket client;
             server.accept(client);
             nth = 0;
+            
+            
             try {
                 WebRequest* request = new WebRequest();
                 WebResponse* response = new WebResponse();
@@ -69,6 +71,7 @@ void WebServer::run() {
                     buff = "";
                     status = client >> buff;
                     data.append(buff);
+                    
                     bytesRead += status;
                     if (parseType == 0) {
                         parseType = 1;
@@ -88,9 +91,8 @@ void WebServer::run() {
                             break;
                         }
                         
-                        //std::cout << "type: " << type << std::endl;
                     } 
-                    //std::cout << "possible: " << std::string::npos << std::endl;
+
                     if (data.find("\r\n\r\n") > -1 && type == "GET") {
                         status = 0;
                     }
@@ -149,8 +151,9 @@ void WebServer::run() {
                     
                     if (type == "POST" && !request->getHeader("Content-Length").empty()) {
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
-                        std::cout << bytesRead - headerLength << " of " << totalBytes << std::endl;
-                        if (bytesRead - headerLength < totalBytes) {
+                        std::cout << (bytesRead - headerLength) / 4 << " of " << totalBytes << std::endl;
+
+                        if ((bytesRead - headerLength) < totalBytes) {
                             status = MAXRECV;
                         }
                     }
@@ -216,10 +219,11 @@ void WebServer::run() {
                         }
                     }
                 }
+                /*
                 std::cout << "---------------- DATA IN START ----------------" << std::endl;
                 std::cout << data << std::endl;
                 std::cout << "---------------- DATA IN END ----------------" << std::endl;
-                
+                */
                 request->parseHeader(data);
 
                 // Create or Load Session

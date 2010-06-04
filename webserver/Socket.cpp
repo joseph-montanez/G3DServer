@@ -145,7 +145,7 @@ int Socket::recv ( std::string& s ) const
     }
   else
     {
-      s = buf;
+      s = std::string(buf, status);
       return status;
     }
 }
