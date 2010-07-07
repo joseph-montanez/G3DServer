@@ -151,7 +151,7 @@ void WebServer::run() {
                     
                     if (type == "POST" && !request->getHeader("Content-Length").empty()) {
                         int totalBytes = WebString::toInt(request->getHeader("Content-Length"));
-                        std::cout << (bytesRead - headerLength) / 4 << " of " << totalBytes << std::endl;
+                        //std::cout << (bytesRead - headerLength) / 4 << " of " << totalBytes << std::endl;
 
                         if ((bytesRead - headerLength) < totalBytes) {
                             status = MAXRECV;

@@ -24,6 +24,8 @@ public:
     void bind(std::string text);
     void fetchAll(const char* query);
     void fetchAll();
+    void exec(const char* query);
+    void exec();
     virtual ~SqlQuery();
     sqlite3** db;
     sqlite3_stmt* stmt;

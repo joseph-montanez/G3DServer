@@ -31,6 +31,7 @@
  * Controllers
  */
 #include "index.cpp"
+#include "lucene.cpp"
 #include "admin/index.cpp"
 #include "admin/login.cpp"
 #include "admin/logout.cpp"
@@ -45,6 +46,7 @@ int main(int argc, char* argv[]) {
 
     server->port = 8181;
     server->addController("/", new IndexController());
+    server->addController("/lucene", new LuceneController());
     server->addController("/admin", new admin::IndexController());
     server->addController("/admin/login", new admin::LoginController());
     server->addController("/admin/logout", new admin::LogoutController());

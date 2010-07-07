@@ -16,10 +16,12 @@ public:
     virtual void onMultipartPost();
     virtual void onStartup();
     void post();
-    virtual std::string intToString(int i);
+    std::string intToString(int i);
     WebRequest* request;
     WebResponse* response;
     WebSession* session;
 };
 
+extern "C" WebController* create_t();
+extern "C" void destroy_t(WebController*);
 #endif

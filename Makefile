@@ -7,6 +7,9 @@ clean:
 	find . -type f -name "*.swp" -exec rm -f {} \;
 	rm -f libwebserver.so webware
 
+clean-website:
+	find ./website -type f -name "*.o" -exec rm -f {} \;	
+
 webserver/ServerSocket.o: webserver/ServerSocket.cpp webserver/ServerSocket.h webserver/SocketException.h webserver/Socket.h
 	g++ $(FLAGS) webserver/ServerSocket.cpp -o webserver/ServerSocket.o
 	
@@ -70,13 +73,20 @@ website/admin/logout.o: website/admin/logout.cpp
 website/blog/layout.o: website/blog/layout.cpp
 	g++ $(FLAGS) -o website/blog/layout.o website/blog/layout.cpp
 	
-website/main.o: website/main.cpp
+website/main.o: website/main.cpp website/index.o website/lucene.o website/blog/layout.o
 	g++ $(FLAGS) -o website/main.o website/main.cpp
+	
+website/lucene.o: website/lucene.cpp website/blog/layout.h
+	g++ $(FLAGS) -o website/lucene.o website/lucene.cpp
 	
 website/index.o: website/index.cpp website/admin/index.cpp
 	g++ $(FLAGS) -o website/index.o website/index.cpp
-
-webware: libwebserver website/index.o website/main.o website/blog/layout.o website/admin/logout.o website/admin/login.o website/admin/dashboard.o website/admin/index.o website/admin/upload/form.o website/admin/blog/posts.o website/admin/blog/comments.o website/admin/layout.o 
-	g++ -g -lpthread -lsqlite3 -o webware webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o website/admin/blog/comments.o website/admin/blog/posts.o website/admin/upload/form.o website/admin/dashboard.o website/admin/index.o website/admin/layout.o website/admin/login.o website/admin/logout.o website/blog/layout.o website/index.o website/main.o
+	
+website/modules/test.o: website/index.cpp website/admin/index.cpp webserver/WebController.o
+	g++ -fPIC -Wl,-E -c website/modules/test.cpp 
+	g++ -shared -Wl,-E -o libtest.so test.o
+	
+webware: libwebserver website/index.o website/main.o website/blog/layout.o website/admin/logout.o website/admin/login.o website/admin/dashboard.o website/admin/index.o website/admin/upload/form.o website/admin/blog/posts.o website/admin/blog/comments.o website/admin/layout.o website/lucene.o website/modules/test.o
+	g++ -g -lclucene-core -lpthread -lsqlite3 -o webware webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o website/admin/blog/comments.o website/admin/blog/posts.o website/admin/upload/form.o website/admin/dashboard.o website/admin/index.o website/admin/layout.o website/admin/login.o website/admin/logout.o website/blog/layout.o website/index.o website/lucene.o website/main.o
     
 

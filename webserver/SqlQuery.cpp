@@ -17,6 +17,16 @@ void SqlQuery::query(const char* query) {
     this->failed = sqlite3_prepare_v2(*this->db, query, -1, &this->stmt, 0);
 }
 
+void SqlQuery::exec() {
+    sqlite3_step(this->stmt);
+    sqlite3_finalize(this->stmt);
+}
+
+void SqlQuery::exec(const char* query) {
+    this->query(query);
+    this->exec();
+}
+
 void SqlQuery::fetchAll(const char* query) {
     this->query(query);
     this->fetchAll();
