@@ -6,32 +6,14 @@ public:
     void get() {
         
     }
-    
-    void append(std::string content) {
-    
-    }
-    
-    void append(const char* content) {
-    
-    }
-    
-    void onMultipartPost() {
-    
-    }
-    
-    void onStartup() {
-    
-    }
 };
 
 
 // the class factories
-extern "C" {
-    WebController* create() {
+extern "C" WebController* create() {
         return new test;
-    }
+}
 
-    void destroy(WebController* controller) {
-        delete controller;
-    }
+extern "C" void destroy(WebController* controller) {
+    delete controller;
 }

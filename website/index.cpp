@@ -53,11 +53,9 @@ public:
             WebController* cont = create_controller();
             cont->get();
             destroy_controller(cont);
+            dlclose(test);
         }
         
-        dlclose(test);
-
-
         sqlite3* db;
         int failed = sqlite3_open("utf.sql", &db);
 

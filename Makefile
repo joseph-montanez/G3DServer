@@ -82,9 +82,9 @@ website/lucene.o: website/lucene.cpp website/blog/layout.h
 website/index.o: website/index.cpp website/admin/index.cpp
 	g++ $(FLAGS) -o website/index.o website/index.cpp
 	
-website/modules/test.o: website/index.cpp website/admin/index.cpp webserver/WebController.o
-	g++ -fPIC -Wl,-E -c website/modules/test.cpp 
-	g++ -shared -Wl,-E -o libtest.so test.o
+website/modules/test.o: website/index.o webserver/WebController.o
+	g++ -c -fPIC website/modules/test.cpp 
+	g++ -shared -o libtest.so -fPIC test.o webserver/WebController.o
 	
 webware: libwebserver website/index.o website/main.o website/blog/layout.o website/admin/logout.o website/admin/login.o website/admin/dashboard.o website/admin/index.o website/admin/upload/form.o website/admin/blog/posts.o website/admin/blog/comments.o website/admin/layout.o website/lucene.o website/modules/test.o
 	g++ -g -lclucene-core -lpthread -lsqlite3 -o webware webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o website/admin/blog/comments.o website/admin/blog/posts.o website/admin/upload/form.o website/admin/dashboard.o website/admin/index.o website/admin/layout.o website/admin/login.o website/admin/logout.o website/blog/layout.o website/index.o website/lucene.o website/main.o

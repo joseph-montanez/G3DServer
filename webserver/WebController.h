@@ -11,10 +11,8 @@ public:
     WebController();
     ~WebController();
     virtual void get();
-    virtual void append(std::string content);
-    virtual void append(const char* content);
-    virtual void onMultipartPost();
-    virtual void onStartup();
+    void append(std::string content);
+    void append(const char* content);
     void post();
     std::string intToString(int i);
     WebRequest* request;
