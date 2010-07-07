@@ -22,6 +22,6 @@ public:
     WebSession* session;
 };
 
-extern "C" WebController* create_t();
-extern "C" void destroy_t(WebController*);
+typedef WebController* create_t();
+typedef void destroy_t(WebController* controller);
 #endif

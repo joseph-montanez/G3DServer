@@ -26,10 +26,12 @@ public:
 
 
 // the class factories
-extern "C" WebController* create() {
-    return new test;
-}
+extern "C" {
+    WebController* create() {
+        return new test;
+    }
 
-extern "C" void destroy(WebController* p) {
-    delete p;
+    void destroy(WebController* controller) {
+        delete controller;
+    }
 }

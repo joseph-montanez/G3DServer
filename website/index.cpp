@@ -54,6 +54,8 @@ public:
             cont->get();
             destroy_controller(cont);
         }
+        
+        dlclose(test);
 
 
         sqlite3* db;
