@@ -9,12 +9,14 @@
 class WebController {
 public:
     WebController();
+    WebController(const char* dynLoader);
     ~WebController();
     virtual void get();
     void append(std::string content);
     void append(const char* content);
     void post();
     std::string intToString(int i);
+    std::string dynfile;
     WebRequest* request;
     WebResponse* response;
     WebSession* session;

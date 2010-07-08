@@ -73,13 +73,13 @@ website/admin/logout.o: website/admin/logout.cpp
 website/blog/layout.o: website/blog/layout.cpp
 	g++ $(FLAGS) -o website/blog/layout.o website/blog/layout.cpp
 	
-website/main.o: website/main.cpp website/index.o website/lucene.o website/blog/layout.o
+website/main.o: website/index.o website/lucene.o website/blog/layout.o
 	g++ $(FLAGS) -o website/main.o website/main.cpp
 	
-website/lucene.o: website/lucene.cpp website/blog/layout.h
+website/lucene.o: 
 	g++ $(FLAGS) -o website/lucene.o website/lucene.cpp
 	
-website/index.o: website/index.cpp website/admin/index.cpp
+website/index.o: 
 	g++ $(FLAGS) -o website/index.o website/index.cpp
 	
 website/modules/test.o: website/index.o webserver/WebController.o

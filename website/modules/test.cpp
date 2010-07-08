@@ -4,7 +4,7 @@
 class test : public WebController {
 public:
     void get() {
-        
+        this->response->body.append("Hello World! 2");
     }
 };
 
