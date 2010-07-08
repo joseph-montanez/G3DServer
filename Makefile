@@ -3,6 +3,7 @@ FLAGS = -c -g -Wall
 all: webware
 
 clean:
+	find . -type f -name "*.so" -exec rm -f {} \;	
 	find . -type f -name "*.o" -exec rm -f {} \;	
 	find . -type f -name "*.swp" -exec rm -f {} \;
 	rm -f libwebserver.so webware
