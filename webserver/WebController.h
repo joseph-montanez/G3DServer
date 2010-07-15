@@ -5,6 +5,9 @@
 #include "WebResponse.h"
 #include "WebSession.h"
 #include <string>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
 
 class WebController {
 public:
@@ -16,10 +19,13 @@ public:
     void append(const char* content);
     void post();
     std::string intToString(int i);
-    std::string dynfile;
     WebRequest* request;
     WebResponse* response;
     WebSession* session;
+    std::string dynfile;
+    void* dynmodule;
+    int dynfileLastMod;
+    static WebController* dynController;
 };
 
 typedef WebController* create_t();

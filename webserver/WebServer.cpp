@@ -30,10 +30,9 @@ void WebServer::addController(std::string uri, WebController* controller) {
 
 void WebServer::run() {
     std::string data, buff;
-    int status, isLoaded, bytesRead, hasBoundary, startBoundary, endBoundary, 
+    int status, bytesRead, hasBoundary, startBoundary, endBoundary, 
         readingBoundary, headerLength;
     unsigned int nth;
-    size_t found;
 
     srand(time(0));
     std::cout << "running....\n";
@@ -93,7 +92,7 @@ void WebServer::run() {
                         
                     } 
 
-                    if (data.find("\r\n\r\n") > -1 && type == "GET") {
+                    if (data.find("\r\n\r\n") > std::string::npos && type == "GET") {
                         status = 0;
                     }
                     
@@ -127,7 +126,7 @@ void WebServer::run() {
                         request->parseHeader(data);
                         std::string contentType = request->getHeader("Content-Type");
                         
-                        if(type == "POST" && contentType.find("multipart") != -1) {
+                        if(type == "POST" && contentType.find("multipart") != std::string::npos) {
                             WebString ws = WebString(contentType);
                             std::vector<std::string> segments = ws.explode(";");
                             segments.erase(segments.begin());
@@ -172,7 +171,7 @@ void WebServer::run() {
                     //std::cout << data << std::endl;
                     WebString ws = WebString(data);
                     std::vector<std::string> segments = ws.explode("--" + boundary + "\r\n");
-                    int boundaryIndex;
+                    size_t boundaryIndex;
                     for (boundaryIndex = 1; boundaryIndex < segments.size(); boundaryIndex++) {
                         std::string segment = segments[boundaryIndex];
                         //std::cout << "Boundary: " << segment << std::endl; 

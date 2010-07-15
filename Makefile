@@ -35,17 +35,17 @@ webserver/WebRequest.o: webserver/WebRequest.cpp webserver/WebRequest.h webserve
 webserver/WebResponse.o: webserver/WebResponse.cpp webserver/WebResponse.h webserver/WebString.h
 	g++ $(FLAGS) webserver/WebResponse.cpp -o webserver/WebResponse.o
 	
-WebServer.o: webserver/WebServer.cpp webserver/WebServer.h webserver/ServerSocket.h webserver/SocketException.h webserver/WebResponse.h webserver/WebRequest.h webserver/WebController.h webserver/WebSession.h webserver/WebServer.h webserver/WebString.h
+webserver/WebServer.o:
 	g++ $(FLAGS) webserver/WebServer.cpp -o webserver/WebServer.o
 
-WebSession.o: webserver/WebSession.cpp webserver/WebSession.h webserver/WebRequest.h webserver/WebResponse.h webserver/WebSession.h
+webserver/WebSession.o: webserver/WebSession.cpp webserver/WebSession.h webserver/WebRequest.h webserver/WebResponse.h webserver/WebSession.h
 	g++ $(FLAGS) webserver/WebSession.cpp -o webserver/WebSession.o
 	
-WebString.o: webserver/WebString.cpp webserver/WebString.h
+webserver/WebString.o: webserver/WebString.cpp webserver/WebString.h
 	g++ $(FLAGS) webserver/WebString.cpp -o webserver/WebString.o
 
 libwebserver:  webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
-	#g++ -fPIC -g -Wall -o libwebserver.so webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
+	ar rcs libwebserver.a webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o
 	
 website/admin/blog/posts.o: website/admin/blog/posts.cpp
 	g++ $(FLAGS) -o website/admin/blog/posts.o website/admin/blog/posts.cpp
@@ -88,6 +88,6 @@ website/modules/test.o: website/index.o webserver/WebController.o
 	g++ -shared -o libtest.so -fPIC test.o webserver/WebController.o
 	
 webware: libwebserver website/index.o website/main.o website/blog/layout.o website/admin/logout.o website/admin/login.o website/admin/dashboard.o website/admin/index.o website/admin/upload/form.o website/admin/blog/posts.o website/admin/blog/comments.o website/admin/layout.o website/lucene.o website/modules/test.o
-	g++ -g -lclucene-core -lpthread -lsqlite3 -o webware webserver/ServerSocket.o webserver/Socket.o webserver/SqlQuery.o webserver/SqlRow.o webserver/WebBoundary.o webserver/WebController.o webserver/WebRequest.o webserver/WebResponse.o webserver/WebServer.o webserver/WebSession.o webserver/WebString.o website/admin/blog/comments.o website/admin/blog/posts.o website/admin/upload/form.o website/admin/dashboard.o website/admin/index.o website/admin/layout.o website/admin/login.o website/admin/logout.o website/blog/layout.o website/index.o website/lucene.o website/main.o
+	g++ -lclucene-core -lpthread -lsqlite3 -L/usr/local/lib/ -o webware -static libwebserver.a website/admin/blog/comments.o website/admin/blog/posts.o website/admin/upload/form.o website/admin/dashboard.o website/admin/index.o website/admin/layout.o website/admin/login.o website/admin/logout.o website/blog/layout.o website/index.o website/lucene.o website/main.o
     
 

@@ -1,5 +1,4 @@
 G3DServer
 
-G3DServer is a C++ web server and web framework. The point it to allow direct 
-access to the network layer, and provide an easy to understand API. This is 
-very experimental and incomplete. 
+G3DServer is a C++ web server and web framework. The point it to provide an easy 
+to understand API. This is very experimental and incomplete. 

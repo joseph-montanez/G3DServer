@@ -164,7 +164,7 @@ std::map<std::string, std::string> WebString::parseHttpHeader(std::string data) 
     WebString ws = WebString(data);
     
     segments = ws.explode(delimiter);
-    for (int i=0; i < segments.size(); i++) {
+    for (size_t i=0; i < segments.size(); i++) {
         ws = WebString(segments[i]);
         segments[i] = ws.trim();
         
@@ -233,9 +233,9 @@ std::vector<std::string> WebString::explode(std::string delimiter) {
 
 std::string WebString::implode(std::string delimiter, std::vector<std::string> segments) {
     std::string result;
-    for (int i=0; i < segments.size(); i++) {
+    for (size_t i=0; i < segments.size(); i++) {
         result += segments[i];
-        if (i + 1 != segments.size()) {
+        if ((size_t) i + 1 != segments.size()) {
             result += delimiter;
         }
     }

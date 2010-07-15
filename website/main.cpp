@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     server->port = 8181;
     server->addController("/", new IndexController());
-    server->addController("/test", new WebController("./website/modules/libtest.so"));
+    server->addController("/test", new WebController("/home/joseph/NetBeansProjects/FireController/dist/Debug/GNU-Linux-x86/libFireController.so"));
     server->addController("/lucene", new LuceneController());
     server->addController("/admin", new admin::IndexController());
     server->addController("/admin/login", new admin::LoginController());
