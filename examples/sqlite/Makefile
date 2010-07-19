@@ -10,5 +10,5 @@ clean:
 	rm -f blog.sql
 	
 
-sqlite-demo: main.cpp listing.cpp layout.cpp PostModel.cpp
-	g++ -g -Wall -lg3dserver -lsqlite3 -o sqlite-demo main.cpp listing.cpp layout.cpp
+sqlite-demo: main.cpp listing.cpp layout.cpp PostModel.cpp edit.cpp
+	g++ -g -Wall -lg3dserver -lsqlite3 -o sqlite-demo main.cpp edit.cpp listing.cpp layout.cpp

@@ -122,6 +122,16 @@ std::string WebString::urlDecode() {
     return encoded;
 }
 
+std::string WebString::replace(std::string replace, std::string with, std::string str) {
+    std::string::size_type index;
+    
+    while (std::string::npos != (index = str.find(replace.c_str()))) {
+        str.replace(index, replace.length(), with);
+    }
+    
+    return str;
+}
+
 int WebString::toInt() {
     return WebString::toInt(this->data);
 }
@@ -266,4 +276,26 @@ std::string WebString::trim() {
     result = result.substr(start, end - start);
     
     return result;
+}
+
+std::string WebString::htmlEntitiesEncode(std::string str) {
+    str = WebString::replace(std::string("&"), std::string("&amp;"), str);
+    str = WebString::replace(std::string("\""), std::string("&quot;"), str);
+    str = WebString::replace(std::string("'"), std::string("&#39;"), str);
+    str = WebString::replace(std::string("<"), std::string("&lt;"), str);
+    str = WebString::replace(std::string(">"), std::string("&gt;"), str);
+    str = WebString::replace(std::string("="), std::string("&#61;"), str);
+    
+    return str;
+}
+
+std::string WebString::htmlEntitiesDecode(std::string str) {
+    str = WebString::replace(std::string("&quot;"), std::string("\""), str);
+    str = WebString::replace(std::string("&#39;"), std::string("'"), str);
+    str = WebString::replace(std::string("&lt;"), std::string("<"), str);
+    str = WebString::replace(std::string("&gt;"), std::string(">"), str);
+    str = WebString::replace(std::string("&#61;"), std::string("="), str);
+    str = WebString::replace(std::string("&amp;"), std::string("&"), str);
+    
+    return str;
 }

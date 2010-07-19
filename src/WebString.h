@@ -37,6 +37,9 @@ public:
     int toInt();
     static int toInt(std::string number);
     static std::string fromInt(int number);
+    static std::string replace(std::string replace, std::string with, std::string str);
+    static std::string htmlEntitiesEncode(std::string str);
+    static std::string htmlEntitiesDecode(std::string str);
     std::string trim();
     std::map<std::string, std::string> parseParams();
     std::map<std::string, std::string> parseParams(std::string delimiter1, std::string delimiter2);

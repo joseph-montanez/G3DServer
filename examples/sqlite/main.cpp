@@ -31,6 +31,7 @@
  * Controllers
  */
 #include "listing.cpp"
+#include "edit.cpp"
 
 int main(int argc, char* argv[]) {
 
@@ -38,6 +39,7 @@ int main(int argc, char* argv[]) {
 
     server->port = 8181;
     server->addController("/", new ListingController());
+    server->addController("/edit", new EditController());
 
     server->run();
     delete server;
