@@ -11,9 +11,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 
 #include <string>
-#include <stdio.h>
-#include <iostream>
-#include <map>
 
 /*
  * Web Server
