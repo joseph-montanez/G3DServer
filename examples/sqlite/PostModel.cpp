@@ -151,7 +151,14 @@ public:
         int columns = sqlite3_column_count(stmt);
 
         for (int column = 0; column < columns; column++) {
-            string value = (const char*) sqlite3_column_text(stmt, column);
+            int columnType = sqlite3_column_type(stmt, column);
+            string value = "";
+            if(columnType == SQLITE_TEXT) {
+                value = (const char*) sqlite3_column_text(stmt, column);
+            } else if (columnType == SQLITE_INTEGER) {
+                int ivalue = sqlite3_column_int(stmt, column);
+                value = WebString::fromInt(ivalue).c_str();
+            }
             string key = sqlite3_column_name(stmt, column);
             row.insert(make_pair(key, value));
         }
@@ -221,7 +228,7 @@ public:
         string query = "";
         query.append("INSERT INTO ")
             .append(this->tableName)
-            .append(" (title, body, created) VALUES(?, ?, date('now'))");
+            .append(" (title, body, created) VALUES(?, ?, DATE('now'))");
             
         sqlite3_stmt* stmt;
         int failed;
@@ -243,6 +250,13 @@ public:
             }
         } else {
             this->error = "Unable to prepare query";
+            return;
+        }
+        
+        int status;
+        status = sqlite3_step(stmt);
+        if(status != SQLITE_OK) {
+            this->error = "Unable to step statement";
             return;
         }
     }
