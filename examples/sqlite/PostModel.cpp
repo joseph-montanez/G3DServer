@@ -255,11 +255,23 @@ public:
         
         int status;
         status = sqlite3_step(stmt);
-        if(status != SQLITE_OK) {
+        if(status != SQLITE_DONE) {
             // Grr figure out the error
             this->error = sqlite3_errmsg(this->db);
             return;
         }
+        
+        /*
+         * If this was transactional we would need a begin and commit :\
+        char *errormsg;
+        status = sqlite3_exec(db, "COMMIT", 0, 0, &errormsg);
+        if(status == SQLITE_ABORT) {
+            this->error.append(errormsg);
+            sqlite3_free(errormsg);
+            return;
+        }
+        sqlite3_free(errormsg);
+        */
     }
     
     sqlite3_int64 lastId() {

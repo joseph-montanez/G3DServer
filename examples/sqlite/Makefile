@@ -10,4 +10,4 @@ clean:
 	rm -f blog.sql
 	
 sqlite-demo: main.cpp listing.cpp layout.cpp PostModel.cpp edit.cpp
-	g++ -pipe -g -Wall -lg3dserver -lsqlite3 -o sqlite-demo main.cpp layout.cpp
+	g++ -g -Wall -lg3dserver -lsqlite3 -o sqlite-demo main.cpp layout.cpp
