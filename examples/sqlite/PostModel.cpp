@@ -243,7 +243,7 @@ public:
                 return;
             }
             
-            binded = sqlite3_bind_text(stmt, 1, body.c_str(), body.length(), SQLITE_STATIC);
+            binded = sqlite3_bind_text(stmt, 2, body.c_str(), body.length(), SQLITE_STATIC);
             if(binded != SQLITE_OK) {
                 this->error = "Unable to bind body to query";
                 return;
@@ -256,7 +256,8 @@ public:
         int status;
         status = sqlite3_step(stmt);
         if(status != SQLITE_OK) {
-            this->error = "Unable to step statement";
+            // Grr figure out the error
+            this->error = sqlite3_errmsg(this->db);
             return;
         }
     }

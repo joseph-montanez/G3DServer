@@ -9,6 +9,5 @@ clean:
 	rm -f sqlite-demo	
 	rm -f blog.sql
 	
-
 sqlite-demo: main.cpp listing.cpp layout.cpp PostModel.cpp edit.cpp
-	g++ -g -Wall -lg3dserver -lsqlite3 -o sqlite-demo main.cpp edit.cpp listing.cpp layout.cpp
+	g++ -pipe -g -Wall -lg3dserver -lsqlite3 -o sqlite-demo main.cpp layout.cpp
