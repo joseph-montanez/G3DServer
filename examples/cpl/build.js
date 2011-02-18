@@ -23,6 +23,7 @@ var filter = new java.io.FilenameFilter({
 });
 
 var files = directory.listFiles(filter);
+var controllers = [];
 for each(var file in files) {
     var file = new java.io.File(file);
     var filename = (file.getName() + "").split(".")[0];
@@ -34,7 +35,7 @@ for each(var file in files) {
     var str = "";
 
     while(data.available() != 0) {
-        str += data.readLine();
+        str += data.readLine() + "\n";
     }
     
     var printOpen = false;
@@ -106,6 +107,12 @@ for each(var file in files) {
             blocks.push(currentCodeBlock);
         }
     }
+    if(outside.length > 0) {
+        currentStringBlock = new Block("string");
+        currentStringBlock.data = outside;
+        blocks.push(currentStringBlock);
+        outside = "";
+    }
     
 
     out =  '#include <string>\n'+
@@ -124,14 +131,24 @@ for each(var file in files) {
         }
         
         if(block.type === "string") {
-            out += indent + "this->response->print(\"" + block.data + "\");\n";
+            data = (new java.lang.String(block.data)).replace("\"", "\\\"");
+            out += indent + "this->response->print(R\"delimiter(" + data + ")delimiter\");\n";
         } else if(block.type === "print") {
             out += indent + "this->response->print(" + block.data + ");\n";
         } else if(block.type === "code") {
             data = data.replace("):", ") {").replace("endfor", "}");
             if(data.indexOf("#include") > -1) {
                 out = data + "\n" + out;
+            } else if(data.indexOf("@page") > -1) {
+                controllers.push([
+                    data.replace("@page=", ""),
+                    functionName,
+                    filename + ".cpp"
+                ]);
             } else {
+                if(data.indexOf("}") === -1 && data.indexOf("{") === -1 && data.substr(-1) !== ";") {
+                    data += ";";
+                }
                 out += indent + data + "\n";
             }
         }
@@ -146,3 +163,35 @@ for each(var file in files) {
 
     print(out);
 }
+
+var main = "";
+main = 
+    "#include <string>\n" +
+    "#include \"g3dserver/WebServer.h\"\n";
+for(var i = 0; i < controllers.length; i++) {
+    var cont = controllers[i];
+    main += "#include \"" + cont[2] + "\"\n";
+}
+
+main += "\n" +
+    "int main(int argc, char* argv[]) {\n" +
+    "    WebServer* server = new WebServer();\n\n" +
+    "    server->port = 8181;\n";
+    
+for(var i = 0; i < controllers.length; i++) {
+    var cont = controllers[i];
+    main += "    server->addController(" + cont[0] + ", new " + cont[1] + "Controller());\n";
+}
+
+main +=
+    "    server->run();\n" +
+    "    delete server;\n" +
+    "    return 0;\n" +
+    "}";
+print(main);
+
+
+fstream = new java.io.FileWriter("main.cpp");
+writer = new java.io.BufferedWriter(fstream);
+writer.write(main);
+writer.close();

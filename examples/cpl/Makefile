@@ -9,8 +9,8 @@ clean:
 	find . -type f -name "*.swp" -exec rm -f {} \;
 	rm -f cpl
 	
-cpl: build.js main.cpp demo.html
-	#killall -9 cpl
+cpl: build.js *.cpp *.html
 	rhino build.js
+	astyle *.cpp
+	rm -f *.orig
 	g++-4.5 -Wall -g -std=c++0x -lg3dserver -o cpl main.cpp
-	#./cpl

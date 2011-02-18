@@ -1,0 +1,8 @@
+To run this demo type:
+make
+
+Then type:
+./cpl
+
+The point of this demo is to show that a templating language can be used, but
+best used to statically compile the code, not at run time.
