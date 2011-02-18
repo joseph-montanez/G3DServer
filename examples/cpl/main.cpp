@@ -16,20 +16,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  * Web Server
  */
 #include "g3dserver/WebServer.h"
-#include "g3dserver/WebController.h"
-
-class IndexController : public WebController {
-public: 
-	void get() {
-		this->response->body.append("Hello World!");
-	}
-};
+#include "demo.cpp"
 
 int main(int argc, char* argv[]) {
     WebServer* server = new WebServer();
 
     server->port = 8181;
-    server->addController("/", new IndexController());
+    server->addController("/", new DemoController());
 
     server->run();
     delete server;

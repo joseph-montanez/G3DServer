@@ -144,6 +144,18 @@ void WebResponse::setCookie(std::string name, std::string value) {
 	this->setHeader(std::string("set-cookie-") + name, cookie);
 }
 
+void WebResponse::print(std::string name) {
+    this->body.append(name);
+}
+
+void WebResponse::print(const char* name) {
+    this->body.append(name);
+}
+
+void WebResponse::print(int number) {
+    this->body.append(WebString::fromInt(number));
+}
+
 std::string WebResponse::toString() {
     std::string body = this->body;
     std::string output;

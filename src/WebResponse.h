@@ -29,6 +29,9 @@ public:
     void setStatus(int status);
     void setContentType(std::string type);
     void setCookie(std::string name, std::string value);
+    void print(std::string name);
+    void print(int number);
+    void print(const char* name);
     std::string toString();
     std::string getDate();
     std::string getCookieDate();

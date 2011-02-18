@@ -88,7 +88,7 @@ void WebServer::run() {
                         parseType = 1;
                         
                         type = WebRequest::parseType(data);
-						request->type = type;
+                        request->type = type;
                         if (type == "GET") {
                         
                         } else if (type == "POST") {
@@ -169,11 +169,11 @@ void WebServer::run() {
                         }
                     }
                     
-					// blah
+                    // blah
                     if (hasBoundary == 1 && readingBoundary == 0) {
                         hasBoundary = 2;
                     }
-					
+                    
                     
                 }
                 //std::cout << data << "\n----------" << std::endl;
@@ -255,10 +255,10 @@ void WebServer::run() {
                     
                 }
                 
-	            //std::cout << "\nsession id:" << session.id << std::endl;
-	            //std::cout << "\nadmin id:" << session.get("admin_id") << std::endl;
+                //std::cout << "\nsession id:" << session.id << std::endl;
+                //std::cout << "\nadmin id:" << session.get("admin_id") << std::endl;
                 
-				std::string out = controller->response->toString();
+                std::string out = controller->response->toString();
                 //std::cout << "---------------- DATA OUT START ----------------" << std::endl;
                 //std::cout << out << std::endl;
                 //std::cout << "---------------- DATA OUT END ----------------" << std::endl;

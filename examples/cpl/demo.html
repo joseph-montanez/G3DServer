@@ -1,0 +1,11 @@
+[auto i = 23;]
+<div>
+    This is [="c++"] [=i]<br />
+    [for(auto i = 0; i < 10000; i++):]
+        I am number [=i]<br />
+    [endfor]
+    <br />
+    <!-- The function from test.cpp -->
+    [#include "test.cpp"]
+    [=test(1, 2)]
+</div>
