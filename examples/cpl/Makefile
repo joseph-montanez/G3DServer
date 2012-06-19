@@ -13,4 +13,4 @@ cpl: build.js *.cpp *.html
 	rhino build.js
 	astyle *.cpp
 	rm -f *.orig
-	g++-4.5 -Wall -g -std=c++0x -lg3dserver -o cpl main.cpp
+	g++ -Wall -g -std=c++0x  -o cpl main.cpp -lg3dserver -ldl
