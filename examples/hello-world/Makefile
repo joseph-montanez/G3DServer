@@ -10,4 +10,4 @@ clean:
 	rm -f hello
 	
 hello: 
-	g++ -lg3dserver -o hello main.cpp
+	g++ -o hello main.cpp -lg3dserver -ldl
